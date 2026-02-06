@@ -546,8 +546,10 @@ body {
 <div class="modal-overlay" id="settingsModal">
   <div class="modal">
     <h2>Settings</h2>
-    <label for="apiKeyInput">JSONBin.io Master Key</label>
-    <input type="text" id="apiKeyInput" placeholder="Enter your Access Key ID">
+    <label for="masterKeyInput">JSONBin.io Master Key (X-Master-Key)</label>
+    <input type="text" id="masterKeyInput" placeholder="$2a$10$...">
+    <label for="accessKeyInput">JSONBin.io Access Key (X-Access-Key)</label>
+    <input type="text" id="accessKeyInput" placeholder="$2a$10$...">
     <label for="binIdInput">Bin ID (leave empty to create new)</label>
     <input type="text" id="binIdInput" placeholder="e.g. 64a1b2c3d4...">
     <div style="margin-top:0.8rem;">
@@ -613,7 +615,7 @@ let topics = [];
 let subjects = [...DEFAULT_SUBJECTS];
 let activeFilter = 'All';
 let selectedColor = SUBJECT_COLORS[0];
-let settings = { apiKey: '$2a$10$6zzHCkKXNKTBhOGsHDRkeugNKF6XB4omyZ9qvOLMi0VpvL0UEb55C', binId: '', autoSync: true };
+let settings = { masterKey: '$2a$10$6zzHCkKXNKTBhOGsHDRkeugNKF6XB4omyZ9qvOLMi0VpvL0UEb55C', accessKey: '$2a$10$jcULTdejTl/CbGpWn7/AieINUAEhPietikVHMbXMxcc1tMQjBmTbW', binId: '', autoSync: true };
 
 // ── Init ──
 function init() {
@@ -644,14 +646,14 @@ function loadTopics() {
     if (d) topics = JSON.parse(d);
   } catch(e) { topics = []; }
   // Also try to pull from JSONBin if configured
-  if (settings.apiKey && settings.binId) {
+  if (settings.masterKey && settings.binId) {
     pullFromCloud();
   }
 }
 
 function saveTopics() {
   localStorage.setItem('sr_topics', JSON.stringify(topics));
-  if (settings.apiKey && settings.autoSync) {
+  if (settings.masterKey && settings.autoSync) {
     pushToCloud();
   }
 }
@@ -666,7 +668,7 @@ function loadSubjects() {
 
 function saveSubjects() {
   localStorage.setItem('sr_subjects', JSON.stringify(subjects));
-  if (settings.apiKey && settings.autoSync) {
+  if (settings.masterKey && settings.autoSync) {
     pushToCloud();
   }
 }
@@ -737,13 +739,15 @@ function confirmAddSubject() {
 
 // ── JSONBin API ──
 async function pushToCloud() {
-  if (!settings.apiKey) return;
+  if (!settings.masterKey) return;
   const dot = document.getElementById('syncDot');
   const label = document.getElementById('syncLabel');
   dot.className = 'sync-dot syncing';
   label.textContent = 'Syncing...';
 
   const payload = { topics, subjects, updatedAt: new Date().toISOString() };
+  const authHeaders = { 'X-Master-Key': settings.masterKey };
+  if (settings.accessKey) authHeaders['X-Access-Key'] = settings.accessKey;
 
   try {
     let res;
@@ -753,7 +757,7 @@ async function pushToCloud() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'X-Master-Key': settings.apiKey,
+          ...authHeaders,
           'X-Bin-Name': 'sr-tracker'
         },
         body: JSON.stringify(payload)
@@ -763,7 +767,7 @@ async function pushToCloud() {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'X-Master-Key': settings.apiKey
+          ...authHeaders
         },
         body: JSON.stringify(payload)
       });
@@ -792,10 +796,12 @@ async function pushToCloud() {
 }
 
 async function pullFromCloud() {
-  if (!settings.apiKey || !settings.binId) return;
+  if (!settings.masterKey || !settings.binId) return;
+  const authHeaders = { 'X-Master-Key': settings.masterKey };
+  if (settings.accessKey) authHeaders['X-Access-Key'] = settings.accessKey;
   try {
     const res = await fetch(`https://api.jsonbin.io/v3/b/${settings.binId}/latest`, {
-      headers: { 'X-Master-Key': settings.apiKey }
+      headers: authHeaders
     });
     if (!res.ok) {
       const err = await res.json();
@@ -833,10 +839,10 @@ async function pullFromCloud() {
 function updateSyncStatus() {
   const dot = document.getElementById('syncDot');
   const label = document.getElementById('syncLabel');
-  if (settings.apiKey && settings.binId) {
+  if (settings.masterKey && settings.binId) {
     dot.className = 'sync-dot online';
     label.textContent = 'Cloud';
-  } else if (settings.apiKey) {
+  } else if (settings.masterKey) {
     dot.className = 'sync-dot online';
     label.textContent = 'Cloud (new)';
   } else {
@@ -1072,7 +1078,8 @@ function escapeHtml(str) {
 
 // ── Settings modal ──
 function openSettings() {
-  document.getElementById('apiKeyInput').value = settings.apiKey;
+  document.getElementById('masterKeyInput').value = settings.masterKey;
+  document.getElementById('accessKeyInput').value = settings.accessKey;
   document.getElementById('binIdInput').value = settings.binId;
   document.getElementById('autoSyncCheckbox').checked = settings.autoSync;
   document.getElementById('settingsModal').classList.add('open');
@@ -1083,14 +1090,15 @@ function closeSettings() {
 }
 
 function saveSettings() {
-  settings.apiKey = document.getElementById('apiKeyInput').value.trim();
+  settings.masterKey = document.getElementById('masterKeyInput').value.trim();
+  settings.accessKey = document.getElementById('accessKeyInput').value.trim();
   settings.binId = document.getElementById('binIdInput').value.trim();
   settings.autoSync = document.getElementById('autoSyncCheckbox').checked;
   saveSettingsToStorage();
   updateSyncStatus();
   closeSettings();
   toast('Settings saved');
-  if (settings.apiKey) {
+  if (settings.masterKey) {
     if (settings.binId) {
       pullFromCloud();
     } else {
