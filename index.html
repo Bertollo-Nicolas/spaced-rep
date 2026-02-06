@@ -546,7 +546,7 @@ body {
 <div class="modal-overlay" id="settingsModal">
   <div class="modal">
     <h2>Settings</h2>
-    <label for="apiKeyInput">JSONBin.io Access Key</label>
+    <label for="apiKeyInput">JSONBin.io Master Key</label>
     <input type="text" id="apiKeyInput" placeholder="Enter your Access Key ID">
     <label for="binIdInput">Bin ID (leave empty to create new)</label>
     <input type="text" id="binIdInput" placeholder="e.g. 64a1b2c3d4...">
@@ -613,7 +613,7 @@ let topics = [];
 let subjects = [...DEFAULT_SUBJECTS];
 let activeFilter = 'All';
 let selectedColor = SUBJECT_COLORS[0];
-let settings = { apiKey: '$2a$10$jcULTdejTl/CbGpWn7/AieINUAEhPietikVHMbXMxcc1tMQjBmTbW', binId: '', autoSync: true };
+let settings = { apiKey: '$2a$10$6zzHCkKXNKTBhOGsHDRkeugNKF6XB4omyZ9qvOLMi0VpvL0UEb55C', binId: '', autoSync: true };
 
 // ── Init ──
 function init() {
@@ -753,7 +753,7 @@ async function pushToCloud() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'X-Access-Key': settings.apiKey,
+          'X-Master-Key': settings.apiKey,
           'X-Bin-Name': 'sr-tracker'
         },
         body: JSON.stringify(payload)
@@ -763,7 +763,7 @@ async function pushToCloud() {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'X-Access-Key': settings.apiKey
+          'X-Master-Key': settings.apiKey
         },
         body: JSON.stringify(payload)
       });
@@ -795,7 +795,7 @@ async function pullFromCloud() {
   if (!settings.apiKey || !settings.binId) return;
   try {
     const res = await fetch(`https://api.jsonbin.io/v3/b/${settings.binId}/latest`, {
-      headers: { 'X-Access-Key': settings.apiKey }
+      headers: { 'X-Master-Key': settings.apiKey }
     });
     if (!res.ok) {
       const err = await res.json();
