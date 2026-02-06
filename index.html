@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spaced Repetition Tracker</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #0f1117;
+  --bg-card: #1a1d27;
+  --bg-hover: #22262f;
+  --bg-input: #14161e;
+  --border: #2a2e3a;
+  --text: #e4e6eb;
+  --text-dim: #8b8fa3;
+  --accent: #6c63ff;
+  --accent-hover: #5a52e0;
+  --success: #22c55e;
+  --success-dim: #166534;
+  --fail: #ef4444;
+  --fail-dim: #7f1d1d;
+  --warn: #f59e0b;
+  --warn-dim: #78350f;
+  --overdue: #ef4444;
+  --due-today: #f59e0b;
+  --due-soon: #3b82f6;
+  --mastered: #22c55e;
+  --radius: 10px;
+  --shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+html { font-size: 15px; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  line-height: 1.5;
+}
+
+/* Header */
+.header {
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border);
+  padding: 0.8rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.header h1 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: -0.02em;
+}
+.header-actions { display: flex; gap: 0.5rem; }
+.icon-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  transition: all 0.15s;
+}
+.icon-btn:hover { background: var(--bg-hover); color: var(--text); border-color: var(--accent); }
+
+/* Main container */
+.container { max-width: 800px; margin: 0 auto; padding: 1rem; }
+
+/* Stats row */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.6rem;
+  margin-bottom: 1rem;
+}
+.stat-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.7rem;
+  text-align: center;
+}
+.stat-num {
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+.stat-label {
+  font-size: 0.7rem;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.stat-overdue .stat-num { color: var(--overdue); }
+.stat-today .stat-num { color: var(--due-today); }
+.stat-soon .stat-num { color: var(--due-soon); }
+.stat-mastered .stat-num { color: var(--mastered); }
+
+/* Tabs */
+.tabs {
+  display: flex;
+  gap: 0.4rem;
+  margin-bottom: 1rem;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding-bottom: 2px;
+}
+.tabs::-webkit-scrollbar { display: none; }
+.tab {
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text-dim);
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 500;
+  white-space: nowrap;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+.tab:hover { border-color: var(--accent); color: var(--text); }
+.tab.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+.tab .count {
+  display: inline-block;
+  background: rgba(255,255,255,0.15);
+  padding: 0 0.4rem;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  margin-left: 0.3rem;
+}
+.tab.active .count { background: rgba(255,255,255,0.25); }
+
+/* Section headers */
+.section-header {
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-dim);
+  margin: 1.2rem 0 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.section-header .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.section-header.overdue .dot { background: var(--overdue); }
+.section-header.today .dot { background: var(--due-today); }
+.section-header.soon .dot { background: var(--due-soon); }
+.section-header.later .dot { background: var(--text-dim); }
+.section-header.mastered .dot { background: var(--mastered); }
+
+/* Topic cards */
+.topic-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.75rem 0.9rem;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  transition: all 0.15s;
+}
+.topic-card:hover { border-color: #3a3e4a; }
+.topic-card.overdue { border-left: 3px solid var(--overdue); }
+.topic-card.due-today { border-left: 3px solid var(--due-today); }
+.topic-card.due-soon { border-left: 3px solid var(--due-soon); }
+.topic-card.mastered-card { border-left: 3px solid var(--mastered); opacity: 0.8; }
+
+.topic-info { flex: 1; min-width: 0; }
+.topic-name {
+  font-weight: 600;
+  font-size: 0.95rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.topic-meta {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem 0.8rem;
+  margin-top: 0.15rem;
+}
+.topic-subject {
+  display: inline-block;
+  padding: 0.1rem 0.45rem;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #fff;
+}
+.subj-ccna { background: #2563eb; }
+.subj-wargame { background: #dc2626; }
+.subj-bashacademy { background: #16a34a; }
+.subj-toeic { background: #9333ea; }
+
+/* Level pips */
+.level-pips {
+  display: flex;
+  gap: 3px;
+  align-items: center;
+}
+.pip {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  background: var(--border);
+  transition: background 0.15s;
+}
+.pip.filled { background: var(--accent); }
+.pip.mastered-pip { background: var(--mastered); }
+
+/* Action buttons on card */
+.topic-actions {
+  display: flex;
+  gap: 0.35rem;
+  flex-shrink: 0;
+}
+.btn-pass, .btn-fail, .btn-del {
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 0.4rem 0.65rem;
+  transition: all 0.15s;
+}
+.btn-pass { background: var(--success-dim); color: var(--success); }
+.btn-pass:hover { background: var(--success); color: #fff; }
+.btn-fail { background: var(--fail-dim); color: var(--fail); }
+.btn-fail:hover { background: var(--fail); color: #fff; }
+.btn-del {
+  background: transparent;
+  color: var(--text-dim);
+  padding: 0.4rem;
+  font-size: 0.9rem;
+}
+.btn-del:hover { color: var(--fail); }
+
+/* Add topic area */
+.add-section {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.9rem;
+  margin-bottom: 1rem;
+}
+.add-row {
+  display: flex;
+  gap: 0.5rem;
+}
+.add-input {
+  flex: 1;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.55rem 0.75rem;
+  color: var(--text);
+  font-size: 0.9rem;
+  outline: none;
+  transition: border-color 0.15s;
+}
+.add-input:focus { border-color: var(--accent); }
+.add-select {
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.55rem 0.75rem;
+  color: var(--text);
+  font-size: 0.85rem;
+  outline: none;
+  cursor: pointer;
+  min-width: 120px;
+}
+.add-select:focus { border-color: var(--accent); }
+.btn-add {
+  background: var(--accent);
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  padding: 0.55rem 1rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s;
+}
+.btn-add:hover { background: var(--accent-hover); }
+
+/* Empty state */
+.empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--text-dim);
+}
+.empty-state .icon { font-size: 2.5rem; margin-bottom: 0.5rem; }
+.empty-state p { font-size: 0.9rem; }
+
+/* Modal overlay */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: 200;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+.modal-overlay.open { display: flex; }
+.modal {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+}
+.modal h2 {
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+}
+.modal label {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--text-dim);
+  margin-bottom: 0.3rem;
+  margin-top: 0.8rem;
+}
+.modal input[type="text"] {
+  width: 100%;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.55rem 0.75rem;
+  color: var(--text);
+  font-size: 0.9rem;
+  outline: none;
+}
+.modal input[type="text"]:focus { border-color: var(--accent); }
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 1.2rem;
+}
+.btn-secondary {
+  background: var(--bg-hover);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  padding: 0.5rem 1rem;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.btn-secondary:hover { border-color: var(--text-dim); }
+.btn-primary {
+  background: var(--accent);
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  padding: 0.5rem 1rem;
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.btn-primary:hover { background: var(--accent-hover); }
+
+/* Sync indicator */
+.sync-status {
+  font-size: 0.7rem;
+  color: var(--text-dim);
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+.sync-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--text-dim);
+}
+.sync-dot.online { background: var(--success); }
+.sync-dot.syncing { background: var(--warn); animation: pulse 1s infinite; }
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+/* Toast */
+.toast-container {
+  position: fixed;
+  bottom: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 300;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: center;
+}
+.toast {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.6rem 1rem;
+  font-size: 0.85rem;
+  box-shadow: var(--shadow);
+  animation: slideUp 0.25s ease-out;
+  white-space: nowrap;
+}
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Responsive */
+@media (max-width: 500px) {
+  .stats-row { grid-template-columns: repeat(2, 1fr); }
+  .add-row { flex-wrap: wrap; }
+  .add-select { min-width: 0; flex: 1; }
+  .btn-add { width: 100%; }
+  .topic-card { flex-wrap: wrap; }
+  .topic-actions { width: 100%; justify-content: flex-end; }
+}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <h1>SR Tracker</h1>
+  <div style="display:flex;align-items:center;gap:0.7rem;">
+    <div class="sync-status" id="syncStatus">
+      <span class="sync-dot" id="syncDot"></span>
+      <span id="syncLabel">Local</span>
+    </div>
+    <div class="header-actions">
+      <button class="icon-btn" onclick="openSettings()" title="Settings" aria-label="Settings">&#9881;</button>
+    </div>
+  </div>
+</header>
+
+<div class="container">
+  <!-- Stats -->
+  <div class="stats-row">
+    <div class="stat-card stat-overdue">
+      <div class="stat-num" id="statOverdue">0</div>
+      <div class="stat-label">Overdue</div>
+    </div>
+    <div class="stat-card stat-today">
+      <div class="stat-num" id="statToday">0</div>
+      <div class="stat-label">Today</div>
+    </div>
+    <div class="stat-card stat-soon">
+      <div class="stat-num" id="statSoon">0</div>
+      <div class="stat-label">Soon</div>
+    </div>
+    <div class="stat-card stat-mastered">
+      <div class="stat-num" id="statMastered">0</div>
+      <div class="stat-label">Mastered</div>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs" id="tabs"></div>
+
+  <!-- Add topic -->
+  <div class="add-section">
+    <div class="add-row">
+      <input class="add-input" id="topicInput" type="text" placeholder="New topic name..." aria-label="Topic name">
+      <select class="add-select" id="subjectSelect" aria-label="Subject">
+        <option value="CCNA">CCNA</option>
+        <option value="Wargame">Wargame</option>
+        <option value="BashAcademy">BashAcademy</option>
+        <option value="TOEIC">TOEIC</option>
+      </select>
+      <button class="btn-add" onclick="addTopic()">Add</button>
+    </div>
+  </div>
+
+  <!-- Topic list -->
+  <div id="topicList"></div>
+</div>
+
+<!-- Settings Modal -->
+<div class="modal-overlay" id="settingsModal">
+  <div class="modal">
+    <h2>Settings</h2>
+    <label for="apiKeyInput">JSONBin.io Access Key</label>
+    <input type="text" id="apiKeyInput" placeholder="Enter your Access Key ID">
+    <label for="binIdInput">Bin ID (leave empty to create new)</label>
+    <input type="text" id="binIdInput" placeholder="e.g. 64a1b2c3d4...">
+    <div style="margin-top:0.8rem;">
+      <label style="margin:0;">
+        <input type="checkbox" id="autoSyncCheckbox" checked>
+        <span style="font-size:0.85rem;color:var(--text);">Auto-sync on changes</span>
+      </label>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="exportData()">Export JSON</button>
+      <label class="btn-secondary" style="display:inline-flex;align-items:center;cursor:pointer;">
+        Import
+        <input type="file" accept=".json" style="display:none;" onchange="importData(event)">
+      </label>
+      <button class="btn-secondary" onclick="closeSettings()">Cancel</button>
+      <button class="btn-primary" onclick="saveSettings()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast container -->
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+// ── Constants ──
+const SUBJECTS = ['CCNA', 'Wargame', 'BashAcademy', 'TOEIC'];
+const INTERVALS = { 1: 1, 2: 3, 3: 7, 4: 14, 5: 30, 6: 60, 7: Infinity };
+const SUBJECT_CLASSES = {
+  CCNA: 'subj-ccna',
+  Wargame: 'subj-wargame',
+  BashAcademy: 'subj-bashacademy',
+  TOEIC: 'subj-toeic'
+};
+
+// ── State ──
+let topics = [];
+let activeFilter = 'All';
+let settings = { apiKey: '$69866891ae596e708f16d18c', binId: '', autoSync: true };
+
+// ── Init ──
+function init() {
+  loadSettings();
+  loadTopics();
+  renderTabs();
+  render();
+  updateSyncStatus();
+}
+
+// ── Storage ──
+function loadSettings() {
+  try {
+    const s = localStorage.getItem('sr_settings');
+    if (s) settings = { ...settings, ...JSON.parse(s) };
+  } catch(e) {}
+}
+
+function saveSettingsToStorage() {
+  localStorage.setItem('sr_settings', JSON.stringify(settings));
+}
+
+function loadTopics() {
+  try {
+    const d = localStorage.getItem('sr_topics');
+    if (d) topics = JSON.parse(d);
+  } catch(e) { topics = []; }
+  // Also try to pull from JSONBin if configured
+  if (settings.apiKey && settings.binId) {
+    pullFromCloud();
+  }
+}
+
+function saveTopics() {
+  localStorage.setItem('sr_topics', JSON.stringify(topics));
+  if (settings.apiKey && settings.autoSync) {
+    pushToCloud();
+  }
+}
+
+// ── JSONBin API ──
+async function pushToCloud() {
+  if (!settings.apiKey) return;
+  const dot = document.getElementById('syncDot');
+  const label = document.getElementById('syncLabel');
+  dot.className = 'sync-dot syncing';
+  label.textContent = 'Syncing...';
+
+  try {
+    if (!settings.binId) {
+      // Create new bin
+      const res = await fetch('https://api.jsonbin.io/v3/b', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Access-Key': settings.apiKey,
+          'X-Bin-Name': 'sr-tracker'
+        },
+        body: JSON.stringify({ topics, updatedAt: new Date().toISOString() })
+      });
+      const data = await res.json();
+      if (data.metadata) {
+        settings.binId = data.metadata.id;
+        saveSettingsToStorage();
+        document.getElementById('binIdInput').value = settings.binId;
+      }
+    } else {
+      await fetch(`https://api.jsonbin.io/v3/b/${settings.binId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Access-Key': settings.apiKey
+        },
+        body: JSON.stringify({ topics, updatedAt: new Date().toISOString() })
+      });
+    }
+    dot.className = 'sync-dot online';
+    label.textContent = 'Synced';
+  } catch(e) {
+    dot.className = 'sync-dot';
+    label.textContent = 'Sync error';
+    toast('Sync failed - saved locally');
+  }
+}
+
+async function pullFromCloud() {
+  if (!settings.apiKey || !settings.binId) return;
+  try {
+    const res = await fetch(`https://api.jsonbin.io/v3/b/${settings.binId}/latest`, {
+      headers: { 'X-Access-Key': settings.apiKey }
+    });
+    const data = await res.json();
+    if (data.record && data.record.topics) {
+      // Merge: cloud wins if it has more recent data
+      const cloudTopics = data.record.topics;
+      if (cloudTopics.length > 0) {
+        // Simple merge: use cloud data, then merge any local-only entries
+        const cloudIds = new Set(cloudTopics.map(t => t.id));
+        const localOnly = topics.filter(t => !cloudIds.has(t.id));
+        topics = [...cloudTopics, ...localOnly];
+        localStorage.setItem('sr_topics', JSON.stringify(topics));
+        render();
+      }
+    }
+    updateSyncStatus();
+  } catch(e) {
+    updateSyncStatus();
+  }
+}
+
+function updateSyncStatus() {
+  const dot = document.getElementById('syncDot');
+  const label = document.getElementById('syncLabel');
+  if (settings.apiKey && settings.binId) {
+    dot.className = 'sync-dot online';
+    label.textContent = 'Cloud';
+  } else if (settings.apiKey) {
+    dot.className = 'sync-dot online';
+    label.textContent = 'Cloud (new)';
+  } else {
+    dot.className = 'sync-dot';
+    label.textContent = 'Local';
+  }
+}
+
+// ── Date helpers ──
+function today() {
+  const d = new Date();
+  return new Date(d.getFullYear(), d.getMonth(), d.getDate()).toISOString().split('T')[0];
+}
+
+function addDays(dateStr, days) {
+  const d = new Date(dateStr + 'T00:00:00');
+  d.setDate(d.getDate() + days);
+  return d.toISOString().split('T')[0];
+}
+
+function daysDiff(dateStr) {
+  const now = new Date(today() + 'T00:00:00');
+  const target = new Date(dateStr + 'T00:00:00');
+  return Math.round((target - now) / (1000 * 60 * 60 * 24));
+}
+
+function formatDate(dateStr) {
+  const diff = daysDiff(dateStr);
+  if (diff < -1) return `${Math.abs(diff)}d overdue`;
+  if (diff === -1) return 'Yesterday';
+  if (diff === 0) return 'Today';
+  if (diff === 1) return 'Tomorrow';
+  if (diff <= 7) return `In ${diff}d`;
+  const d = new Date(dateStr + 'T00:00:00');
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+}
+
+// ── Topic operations ──
+function addTopic() {
+  const input = document.getElementById('topicInput');
+  const name = input.value.trim();
+  if (!name) { input.focus(); return; }
+  const subject = document.getElementById('subjectSelect').value;
+
+  topics.push({
+    id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+    name,
+    subject,
+    level: 1,
+    nextReview: today(),
+    history: [],
+    createdAt: today()
+  });
+
+  input.value = '';
+  input.focus();
+  saveTopics();
+  renderTabs();
+  render();
+  toast(`Added "${name}" to ${subject}`);
+}
+
+function markSuccess(id) {
+  const t = topics.find(x => x.id === id);
+  if (!t) return;
+  t.history.push({ date: today(), result: 'pass', fromLevel: t.level });
+  if (t.level < 7) {
+    t.nextReview = addDays(today(), INTERVALS[t.level]);
+    t.level++;
+  }
+  if (t.level === 7) {
+    t.nextReview = null; // mastered
+  }
+  saveTopics();
+  renderTabs();
+  render();
+}
+
+function markFail(id) {
+  const t = topics.find(x => x.id === id);
+  if (!t) return;
+  t.history.push({ date: today(), result: 'fail', fromLevel: t.level });
+  t.level = 1;
+  t.nextReview = addDays(today(), INTERVALS[1]);
+  saveTopics();
+  renderTabs();
+  render();
+}
+
+function deleteTopic(id) {
+  const t = topics.find(x => x.id === id);
+  if (!t) return;
+  if (!confirm(`Delete "${t.name}"?`)) return;
+  topics = topics.filter(x => x.id !== id);
+  saveTopics();
+  renderTabs();
+  render();
+}
+
+// ── Categorize topics ──
+function categorize(topic) {
+  if (topic.level === 7) return 'mastered';
+  const diff = daysDiff(topic.nextReview);
+  if (diff < 0) return 'overdue';
+  if (diff === 0) return 'today';
+  if (diff <= 3) return 'soon';
+  return 'later';
+}
+
+// ── Render ──
+function renderTabs() {
+  const container = document.getElementById('tabs');
+  const counts = { All: topics.length };
+  SUBJECTS.forEach(s => { counts[s] = topics.filter(t => t.subject === s).length; });
+
+  container.innerHTML = ['All', ...SUBJECTS].map(s =>
+    `<button class="tab${activeFilter === s ? ' active' : ''}" onclick="setFilter('${s}')">
+      ${s}<span class="count">${counts[s]}</span>
+    </button>`
+  ).join('');
+}
+
+function setFilter(f) {
+  activeFilter = f;
+  renderTabs();
+  render();
+}
+
+function render() {
+  const filtered = activeFilter === 'All' ? topics : topics.filter(t => t.subject === activeFilter);
+  const groups = { overdue: [], today: [], soon: [], later: [], mastered: [] };
+  filtered.forEach(t => {
+    const cat = categorize(t);
+    groups[cat].push(t);
+  });
+
+  // Sort: overdue by most overdue first, others by soonest first
+  groups.overdue.sort((a, b) => daysDiff(a.nextReview) - daysDiff(b.nextReview));
+  groups.today.sort((a, b) => a.name.localeCompare(b.name));
+  groups.soon.sort((a, b) => daysDiff(a.nextReview) - daysDiff(b.nextReview));
+  groups.later.sort((a, b) => daysDiff(a.nextReview) - daysDiff(b.nextReview));
+  groups.mastered.sort((a, b) => a.name.localeCompare(b.name));
+
+  // Update stats (always show all topics, not filtered)
+  const allGroups = { overdue: 0, today: 0, soon: 0, mastered: 0 };
+  topics.forEach(t => {
+    const cat = categorize(t);
+    if (cat === 'overdue') allGroups.overdue++;
+    else if (cat === 'today') allGroups.today++;
+    else if (cat === 'soon') allGroups.soon++;
+    else if (cat === 'mastered') allGroups.mastered++;
+  });
+  document.getElementById('statOverdue').textContent = allGroups.overdue;
+  document.getElementById('statToday').textContent = allGroups.today;
+  document.getElementById('statSoon').textContent = allGroups.soon;
+  document.getElementById('statMastered').textContent = allGroups.mastered;
+
+  const container = document.getElementById('topicList');
+  if (filtered.length === 0) {
+    container.innerHTML = `<div class="empty-state">
+      <div class="icon">&#128218;</div>
+      <p>No topics yet. Add one above to start tracking!</p>
+    </div>`;
+    return;
+  }
+
+  let html = '';
+  const sections = [
+    { key: 'overdue', label: 'Overdue', cls: 'overdue' },
+    { key: 'today', label: 'Due Today', cls: 'today' },
+    { key: 'soon', label: 'Coming Soon', cls: 'soon' },
+    { key: 'later', label: 'Later', cls: 'later' },
+    { key: 'mastered', label: 'Mastered', cls: 'mastered' }
+  ];
+
+  sections.forEach(sec => {
+    if (groups[sec.key].length === 0) return;
+    html += `<div class="section-header ${sec.cls}"><span class="dot"></span>${sec.label} (${groups[sec.key].length})</div>`;
+    groups[sec.key].forEach(t => {
+      html += renderCard(t, sec.key);
+    });
+  });
+
+  container.innerHTML = html;
+}
+
+function renderCard(t, category) {
+  const subjClass = SUBJECT_CLASSES[t.subject] || '';
+  const cardClass = category === 'overdue' ? 'overdue'
+    : category === 'today' ? 'due-today'
+    : category === 'soon' ? 'due-soon'
+    : category === 'mastered' ? 'mastered-card' : '';
+
+  const pips = Array.from({ length: 7 }, (_, i) => {
+    const filled = i < t.level;
+    const cls = t.level === 7 ? 'pip mastered-pip' : (filled ? 'pip filled' : 'pip');
+    return `<span class="${cls}"></span>`;
+  }).join('');
+
+  const dateStr = t.level === 7 ? 'Mastered' : formatDate(t.nextReview);
+  const isMastered = t.level === 7;
+  const sessions = t.history ? t.history.length : 0;
+
+  return `<div class="topic-card ${cardClass}">
+    <div class="topic-info">
+      <div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;">
+        <span class="topic-subject ${subjClass}">${t.subject}</span>
+        <span class="topic-name">${escapeHtml(t.name)}</span>
+      </div>
+      <div class="topic-meta">
+        <span>Lv ${t.level}/7</span>
+        <span>${dateStr}</span>
+        <span>${sessions} session${sessions !== 1 ? 's' : ''}</span>
+      </div>
+      <div class="level-pips" style="margin-top:0.3rem;">${pips}</div>
+    </div>
+    <div class="topic-actions">
+      ${!isMastered ? `
+        <button class="btn-pass" onclick="markSuccess('${t.id}')" title="Passed review">Pass</button>
+        <button class="btn-fail" onclick="markFail('${t.id}')" title="Failed review">Fail</button>
+      ` : ''}
+      <button class="btn-del" onclick="deleteTopic('${t.id}')" title="Delete">&times;</button>
+    </div>
+  </div>`;
+}
+
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+// ── Settings modal ──
+function openSettings() {
+  document.getElementById('apiKeyInput').value = settings.apiKey;
+  document.getElementById('binIdInput').value = settings.binId;
+  document.getElementById('autoSyncCheckbox').checked = settings.autoSync;
+  document.getElementById('settingsModal').classList.add('open');
+}
+
+function closeSettings() {
+  document.getElementById('settingsModal').classList.remove('open');
+}
+
+function saveSettings() {
+  settings.apiKey = document.getElementById('apiKeyInput').value.trim();
+  settings.binId = document.getElementById('binIdInput').value.trim();
+  settings.autoSync = document.getElementById('autoSyncCheckbox').checked;
+  saveSettingsToStorage();
+  updateSyncStatus();
+  closeSettings();
+  toast('Settings saved');
+  if (settings.apiKey) {
+    if (settings.binId) {
+      pullFromCloud();
+    } else {
+      pushToCloud();
+    }
+  }
+}
+
+// ── Export / Import ──
+function exportData() {
+  const blob = new Blob([JSON.stringify({ topics, settings: { binId: settings.binId }, exportedAt: new Date().toISOString() }, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `sr-tracker-backup-${today()}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  toast('Data exported');
+}
+
+function importData(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const data = JSON.parse(e.target.result);
+      if (data.topics && Array.isArray(data.topics)) {
+        topics = data.topics;
+        saveTopics();
+        renderTabs();
+        render();
+        toast(`Imported ${topics.length} topics`);
+      } else {
+        toast('Invalid file format');
+      }
+    } catch(err) {
+      toast('Failed to parse file');
+    }
+  };
+  reader.readAsText(file);
+  event.target.value = '';
+}
+
+// ── Toast ──
+function toast(msg) {
+  const container = document.getElementById('toastContainer');
+  const el = document.createElement('div');
+  el.className = 'toast';
+  el.textContent = msg;
+  container.appendChild(el);
+  setTimeout(() => { el.remove(); }, 2500);
+}
+
+// ── Keyboard shortcut ──
+document.getElementById('topicInput').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') addTopic();
+});
+
+// Close modal on overlay click
+document.getElementById('settingsModal').addEventListener('click', function(e) {
+  if (e.target === this) closeSettings();
+});
+
+// ── Start ──
+init();
+</script>
+</body>
+</html>
