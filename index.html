@@ -78,6 +78,26 @@ body {
 /* Main container */
 .container { max-width: 800px; margin: 0 auto; padding: 1rem; }
 
+/* View toggle */
+.view-toggle {
+  display: flex;
+  gap: 0.4rem;
+  margin-bottom: 1rem;
+}
+.view-btn {
+  padding: 0.4rem 0.8rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text-dim);
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 500;
+  transition: all 0.15s;
+}
+.view-btn:hover { border-color: var(--accent); color: var(--text); }
+.view-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
 /* Stats row */
 .stats-row {
   display: grid;
@@ -111,40 +131,39 @@ body {
 /* Tabs */
 .tabs {
   display: flex;
+  flex-wrap: wrap;
   gap: 0.4rem;
   margin-bottom: 1rem;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
-  padding-bottom: 2px;
 }
-.tabs::-webkit-scrollbar { display: none; }
 .tab {
-  padding: 0.5rem 1rem;
+  padding: 0.45rem 0.8rem;
   border-radius: var(--radius);
   border: 1px solid var(--border);
   background: var(--bg-card);
   color: var(--text-dim);
   cursor: pointer;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   font-weight: 500;
   white-space: nowrap;
   transition: all 0.15s;
-  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
 }
 .tab:hover { border-color: var(--accent); color: var(--text); }
-.tab.active {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: #fff;
+.tab.active { color: #fff; }
+.tab .color-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
 }
 .tab .count {
   display: inline-block;
   background: rgba(255,255,255,0.15);
   padding: 0 0.4rem;
   border-radius: 8px;
-  font-size: 0.75rem;
-  margin-left: 0.3rem;
+  font-size: 0.7rem;
 }
 .tab.active .count { background: rgba(255,255,255,0.25); }
 
@@ -214,12 +233,8 @@ body {
   font-weight: 600;
   color: #fff;
 }
-.subj-ccna { background: #2563eb; }
-.subj-wargame { background: #dc2626; }
-.subj-bashacademy { background: #16a34a; }
-.subj-toeic { background: #9333ea; }
 
-/* Add-subject button in the select area */
+/* Add-subject button */
 .add-subject-row {
   display: flex;
   gap: 0.5rem;
@@ -255,6 +270,42 @@ body {
 }
 .color-swatch:hover { transform: scale(1.15); }
 .color-swatch.selected { border-color: #fff; box-shadow: 0 0 0 2px var(--accent); }
+
+/* Subject list in modal */
+.subject-list {
+  margin-top: 0.8rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  max-height: 200px;
+  overflow-y: auto;
+}
+.subject-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.6rem;
+  background: var(--bg-input);
+  border-radius: 6px;
+  font-size: 0.85rem;
+}
+.subject-item .color-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.subject-item .subject-name { flex: 1; }
+.subject-item .btn-del-subject {
+  background: transparent;
+  border: none;
+  color: var(--text-dim);
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 0 0.3rem;
+  transition: color 0.15s;
+}
+.subject-item .btn-del-subject:hover { color: var(--fail); }
 
 /* Level pips */
 .level-pips {
@@ -476,6 +527,88 @@ body {
   to { opacity: 1; transform: translateY(0); }
 }
 
+/* Calendar */
+.calendar-container {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+.calendar-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.8rem;
+}
+.calendar-nav button {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  border-radius: 6px;
+  padding: 0.3rem 0.6rem;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: all 0.15s;
+}
+.calendar-nav button:hover { border-color: var(--accent); color: var(--text); }
+.calendar-nav .month-label {
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+}
+.calendar-day-header {
+  text-align: center;
+  font-size: 0.65rem;
+  color: var(--text-dim);
+  font-weight: 600;
+  text-transform: uppercase;
+  padding: 0.3rem 0;
+}
+.calendar-day {
+  aspect-ratio: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  position: relative;
+  cursor: default;
+  min-height: 36px;
+}
+.calendar-day.other-month { opacity: 0.3; }
+.calendar-day.today-cell { border: 1px solid var(--accent); color: var(--text); }
+.calendar-day .day-num { font-weight: 500; }
+.calendar-day .day-dots {
+  display: flex;
+  gap: 2px;
+  margin-top: 2px;
+  flex-wrap: wrap;
+  justify-content: center;
+  max-width: 100%;
+}
+.calendar-day .day-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.calendar-day .day-count {
+  font-size: 0.55rem;
+  color: var(--text);
+  background: var(--accent);
+  border-radius: 4px;
+  padding: 0 3px;
+  margin-top: 1px;
+  line-height: 1.3;
+}
+
 /* Responsive */
 @media (max-width: 500px) {
   .stats-row { grid-template-columns: repeat(2, 1fr); }
@@ -523,6 +656,12 @@ body {
     </div>
   </div>
 
+  <!-- View toggle -->
+  <div class="view-toggle">
+    <button class="view-btn active" id="viewList" onclick="setView('list')">List</button>
+    <button class="view-btn" id="viewCalendar" onclick="setView('calendar')">Calendar</button>
+  </div>
+
   <!-- Tabs -->
   <div class="tabs" id="tabs"></div>
 
@@ -537,6 +676,9 @@ body {
       <button class="btn-add-subject" onclick="openAddSubject()">+ Add Subject</button>
     </div>
   </div>
+
+  <!-- Calendar view -->
+  <div id="calendarView" style="display:none;"></div>
 
   <!-- Topic list -->
   <div id="topicList"></div>
@@ -573,13 +715,15 @@ body {
 <!-- Add Subject Modal -->
 <div class="modal-overlay" id="addSubjectModal">
   <div class="modal">
-    <h2>Add Subject</h2>
-    <label for="subjectNameInput">Subject Name</label>
+    <h2>Manage Subjects</h2>
+    <label>Existing subjects</label>
+    <div class="subject-list" id="subjectList"></div>
+    <label for="subjectNameInput">New Subject Name</label>
     <input type="text" id="subjectNameInput" placeholder="e.g. Python, Math...">
     <label>Color</label>
     <div class="color-grid" id="colorGrid"></div>
     <div class="modal-actions">
-      <button class="btn-secondary" onclick="closeAddSubject()">Cancel</button>
+      <button class="btn-secondary" onclick="closeAddSubject()">Close</button>
       <button class="btn-primary" onclick="confirmAddSubject()">Add</button>
     </div>
   </div>
@@ -602,19 +746,15 @@ const SUBJECT_COLORS = [
   '#059669', '#7c3aed', '#0284c7', '#db2777', '#65a30d'
 ];
 const INTERVALS = { 1: 1, 2: 3, 3: 7, 4: 14, 5: 30, 6: 60, 7: Infinity };
-// Legacy CSS class map (for built-in subjects)
-const SUBJECT_CLASSES = {
-  CCNA: 'subj-ccna',
-  Wargame: 'subj-wargame',
-  BashAcademy: 'subj-bashacademy',
-  TOEIC: 'subj-toeic'
-};
 
 // ── State ──
 let topics = [];
 let subjects = [...DEFAULT_SUBJECTS];
 let activeFilter = 'All';
 let selectedColor = SUBJECT_COLORS[0];
+let currentView = 'list';
+let calendarMonth = new Date().getMonth();
+let calendarYear = new Date().getFullYear();
 let settings = { masterKey: '$2a$10$6zzHCkKXNKTBhOGsHDRkeugNKF6XB4omyZ9qvOLMi0VpvL0UEb55C', accessKey: '$2a$10$jcULTdejTl/CbGpWn7/AieINUAEhPietikVHMbXMxcc1tMQjBmTbW', binId: '', autoSync: true };
 
 // ── Init ──
@@ -645,7 +785,6 @@ function loadTopics() {
     const d = localStorage.getItem('sr_topics');
     if (d) topics = JSON.parse(d);
   } catch(e) { topics = []; }
-  // Also try to pull from JSONBin if configured
   if (settings.masterKey && settings.binId) {
     pullFromCloud();
   }
@@ -687,6 +826,10 @@ function renderSubjectSelect() {
   select.innerHTML = subjects.map(s =>
     `<option value="${escapeHtml(s.name)}">${escapeHtml(s.name)}</option>`
   ).join('');
+  // Keep active filter selection in sync
+  if (activeFilter !== 'All' && subjects.find(s => s.name === activeFilter)) {
+    select.value = activeFilter;
+  }
 }
 
 // ── Add Subject modal ──
@@ -694,12 +837,39 @@ function openAddSubject() {
   selectedColor = SUBJECT_COLORS[0];
   document.getElementById('subjectNameInput').value = '';
   renderColorGrid();
+  renderSubjectList();
   document.getElementById('addSubjectModal').classList.add('open');
   document.getElementById('subjectNameInput').focus();
 }
 
 function closeAddSubject() {
   document.getElementById('addSubjectModal').classList.remove('open');
+}
+
+function renderSubjectList() {
+  const container = document.getElementById('subjectList');
+  container.innerHTML = subjects.map((s, i) =>
+    `<div class="subject-item">
+      <span class="color-dot" style="background:${s.color};"></span>
+      <span class="subject-name">${escapeHtml(s.name)}</span>
+      <button class="btn-del-subject" onclick="deleteSubject(${i})" title="Delete subject">&times;</button>
+    </div>`
+  ).join('');
+}
+
+function deleteSubject(index) {
+  const subj = subjects[index];
+  const usedCount = topics.filter(t => t.subject === subj.name).length;
+  if (usedCount > 0) {
+    if (!confirm(`"${subj.name}" is used by ${usedCount} topic(s). Delete anyway? Topics will keep their subject label.`)) return;
+  }
+  subjects.splice(index, 1);
+  saveSubjects();
+  renderSubjectSelect();
+  renderSubjectList();
+  renderTabs();
+  render();
+  toast(`Subject "${subj.name}" deleted`);
 }
 
 function renderColorGrid() {
@@ -729,11 +899,11 @@ function confirmAddSubject() {
   subjects.push({ name, color: selectedColor });
   saveSubjects();
   renderSubjectSelect();
+  renderSubjectList();
   renderTabs();
   render();
-  closeAddSubject();
-  // Auto-select the new subject in dropdown
   document.getElementById('subjectSelect').value = name;
+  document.getElementById('subjectNameInput').value = '';
   toast(`Subject "${name}" added`);
 }
 
@@ -752,7 +922,6 @@ async function pushToCloud() {
   try {
     let res;
     if (!settings.binId) {
-      // Create new bin
       res = await fetch('https://api.jsonbin.io/v3/b', {
         method: 'POST',
         headers: {
@@ -809,7 +978,6 @@ async function pullFromCloud() {
     }
     const data = await res.json();
     if (data.record) {
-      // Merge topics
       if (data.record.topics && data.record.topics.length > 0) {
         const cloudTopics = data.record.topics;
         const cloudIds = new Set(cloudTopics.map(t => t.id));
@@ -817,7 +985,6 @@ async function pullFromCloud() {
         topics = [...cloudTopics, ...localOnly];
         localStorage.setItem('sr_topics', JSON.stringify(topics));
       }
-      // Merge subjects
       if (data.record.subjects && data.record.subjects.length > 0) {
         const cloudSubjects = data.record.subjects;
         const cloudNames = new Set(cloudSubjects.map(s => s.name));
@@ -892,7 +1059,7 @@ function addTopic() {
     name,
     subject,
     level: 1,
-    nextReview: today(),
+    nextReview: addDays(today(), 1),
     history: [],
     createdAt: today()
   });
@@ -914,7 +1081,7 @@ function markSuccess(id) {
     t.level++;
   }
   if (t.level === 7) {
-    t.nextReview = null; // mastered
+    t.nextReview = null;
   }
   saveTopics();
   renderTabs();
@@ -952,6 +1119,106 @@ function categorize(topic) {
   return 'later';
 }
 
+// ── View toggle ──
+function setView(view) {
+  currentView = view;
+  document.getElementById('viewList').classList.toggle('active', view === 'list');
+  document.getElementById('viewCalendar').classList.toggle('active', view === 'calendar');
+  document.getElementById('topicList').style.display = view === 'list' ? '' : 'none';
+  document.getElementById('calendarView').style.display = view === 'calendar' ? '' : 'none';
+  if (view === 'calendar') renderCalendar();
+}
+
+// ── Calendar ──
+function renderCalendar() {
+  const container = document.getElementById('calendarView');
+  const year = calendarYear;
+  const month = calendarMonth;
+  const firstDay = new Date(year, month, 1);
+  const lastDay = new Date(year, month + 1, 0);
+  const startDow = firstDay.getDay(); // 0=Sun
+  const daysInMonth = lastDay.getDate();
+  const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+  // Build map of date -> topics
+  const filtered = activeFilter === 'All' ? topics : topics.filter(t => t.subject === activeFilter);
+  const dateMap = {};
+  filtered.forEach(t => {
+    if (t.level === 7) return; // skip mastered
+    const d = t.nextReview;
+    if (!d) return;
+    if (!dateMap[d]) dateMap[d] = [];
+    dateMap[d].push(t);
+  });
+
+  const todayStr = today();
+
+  let html = `<div class="calendar-container">
+    <div class="calendar-nav">
+      <button onclick="calendarPrev()">&larr;</button>
+      <span class="month-label">${monthNames[month]} ${year}</span>
+      <button onclick="calendarNext()">&rarr;</button>
+    </div>
+    <div class="calendar-grid">`;
+
+  // Day headers
+  const dayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  dayNames.forEach(d => {
+    html += `<div class="calendar-day-header">${d}</div>`;
+  });
+
+  // Previous month padding
+  const prevMonth = new Date(year, month, 0);
+  const prevDays = prevMonth.getDate();
+  for (let i = startDow - 1; i >= 0; i--) {
+    const dayNum = prevDays - i;
+    html += `<div class="calendar-day other-month"><span class="day-num">${dayNum}</span></div>`;
+  }
+
+  // Current month days
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const isToday = dateStr === todayStr;
+    const dayTopics = dateMap[dateStr] || [];
+
+    let dotsHtml = '';
+    if (dayTopics.length > 0 && dayTopics.length <= 4) {
+      dotsHtml = '<div class="day-dots">' + dayTopics.map(t =>
+        `<span class="day-dot" style="background:${getSubjectColor(t.subject)};"></span>`
+      ).join('') + '</div>';
+    } else if (dayTopics.length > 4) {
+      dotsHtml = `<span class="day-count">${dayTopics.length}</span>`;
+    }
+
+    html += `<div class="calendar-day${isToday ? ' today-cell' : ''}" title="${dayTopics.map(t=>t.name).join(', ')}">
+      <span class="day-num">${d}</span>
+      ${dotsHtml}
+    </div>`;
+  }
+
+  // Next month padding
+  const totalCells = startDow + daysInMonth;
+  const remaining = (7 - (totalCells % 7)) % 7;
+  for (let i = 1; i <= remaining; i++) {
+    html += `<div class="calendar-day other-month"><span class="day-num">${i}</span></div>`;
+  }
+
+  html += '</div></div>';
+  container.innerHTML = html;
+}
+
+function calendarPrev() {
+  calendarMonth--;
+  if (calendarMonth < 0) { calendarMonth = 11; calendarYear--; }
+  renderCalendar();
+}
+
+function calendarNext() {
+  calendarMonth++;
+  if (calendarMonth > 11) { calendarMonth = 0; calendarYear++; }
+  renderCalendar();
+}
+
 // ── Render ──
 function renderTabs() {
   const container = document.getElementById('tabs');
@@ -959,15 +1226,26 @@ function renderTabs() {
   const counts = { All: topics.length };
   names.forEach(s => { counts[s] = topics.filter(t => t.subject === s).length; });
 
-  container.innerHTML = ['All', ...names].map(s =>
-    `<button class="tab${activeFilter === s ? ' active' : ''}" onclick="setFilter('${escapeHtml(s).replace(/'/g, "\\'")}')">
+  container.innerHTML = ['All', ...names].map(s => {
+    const isAll = s === 'All';
+    const color = isAll ? 'var(--accent)' : getSubjectColor(s);
+    const isActive = activeFilter === s;
+    const bgStyle = isActive
+      ? `background:${color};border-color:${color};`
+      : `border-color:var(--border);`;
+    return `<button class="tab${isActive ? ' active' : ''}" style="${bgStyle}" onclick="setFilter('${escapeHtml(s).replace(/'/g, "\\'")}')">
+      ${!isAll ? `<span class="color-dot" style="background:${isActive ? '#fff' : color};"></span>` : ''}
       ${escapeHtml(s)}<span class="count">${counts[s]}</span>
-    </button>`
-  ).join('');
+    </button>`;
+  }).join('');
 }
 
 function setFilter(f) {
   activeFilter = f;
+  // Auto-select subject in the add-topic dropdown
+  if (f !== 'All' && subjects.find(s => s.name === f)) {
+    document.getElementById('subjectSelect').value = f;
+  }
   renderTabs();
   render();
 }
@@ -980,7 +1258,6 @@ function render() {
     groups[cat].push(t);
   });
 
-  // Sort: overdue by most overdue first, others by soonest first
   groups.overdue.sort((a, b) => daysDiff(a.nextReview) - daysDiff(b.nextReview));
   groups.today.sort((a, b) => a.name.localeCompare(b.name));
   groups.soon.sort((a, b) => daysDiff(a.nextReview) - daysDiff(b.nextReview));
@@ -1007,6 +1284,7 @@ function render() {
       <div class="icon">&#128218;</div>
       <p>No topics yet. Add one above to start tracking!</p>
     </div>`;
+    if (currentView === 'calendar') renderCalendar();
     return;
   }
 
@@ -1028,6 +1306,8 @@ function render() {
   });
 
   container.innerHTML = html;
+
+  if (currentView === 'calendar') renderCalendar();
 }
 
 function renderCard(t, category) {
