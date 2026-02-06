@@ -219,6 +219,43 @@ body {
 .subj-bashacademy { background: #16a34a; }
 .subj-toeic { background: #9333ea; }
 
+/* Add-subject button in the select area */
+.add-subject-row {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+.btn-add-subject {
+  background: transparent;
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+  color: var(--text-dim);
+  padding: 0.4rem 0.75rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.btn-add-subject:hover { border-color: var(--accent); color: var(--accent); }
+
+/* Color picker grid */
+.color-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.4rem;
+}
+.color-swatch {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.color-swatch:hover { transform: scale(1.15); }
+.color-swatch.selected { border-color: #fff; box-shadow: 0 0 0 2px var(--accent); }
+
 /* Level pips */
 .level-pips {
   display: flex;
@@ -493,13 +530,11 @@ body {
   <div class="add-section">
     <div class="add-row">
       <input class="add-input" id="topicInput" type="text" placeholder="New topic name..." aria-label="Topic name">
-      <select class="add-select" id="subjectSelect" aria-label="Subject">
-        <option value="CCNA">CCNA</option>
-        <option value="Wargame">Wargame</option>
-        <option value="BashAcademy">BashAcademy</option>
-        <option value="TOEIC">TOEIC</option>
-      </select>
+      <select class="add-select" id="subjectSelect" aria-label="Subject"></select>
       <button class="btn-add" onclick="addTopic()">Add</button>
+    </div>
+    <div class="add-subject-row">
+      <button class="btn-add-subject" onclick="openAddSubject()">+ Add Subject</button>
     </div>
   </div>
 
@@ -533,13 +568,39 @@ body {
   </div>
 </div>
 
+<!-- Add Subject Modal -->
+<div class="modal-overlay" id="addSubjectModal">
+  <div class="modal">
+    <h2>Add Subject</h2>
+    <label for="subjectNameInput">Subject Name</label>
+    <input type="text" id="subjectNameInput" placeholder="e.g. Python, Math...">
+    <label>Color</label>
+    <div class="color-grid" id="colorGrid"></div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeAddSubject()">Cancel</button>
+      <button class="btn-primary" onclick="confirmAddSubject()">Add</button>
+    </div>
+  </div>
+</div>
+
 <!-- Toast container -->
 <div class="toast-container" id="toastContainer"></div>
 
 <script>
 // ── Constants ──
-const SUBJECTS = ['CCNA', 'Wargame', 'BashAcademy', 'TOEIC'];
+const DEFAULT_SUBJECTS = [
+  { name: 'CCNA', color: '#2563eb' },
+  { name: 'Wargame', color: '#dc2626' },
+  { name: 'BashAcademy', color: '#16a34a' },
+  { name: 'TOEIC', color: '#9333ea' }
+];
+const SUBJECT_COLORS = [
+  '#2563eb', '#dc2626', '#16a34a', '#9333ea', '#ea580c',
+  '#0891b2', '#d946ef', '#ca8a04', '#64748b', '#e11d48',
+  '#059669', '#7c3aed', '#0284c7', '#db2777', '#65a30d'
+];
 const INTERVALS = { 1: 1, 2: 3, 3: 7, 4: 14, 5: 30, 6: 60, 7: Infinity };
+// Legacy CSS class map (for built-in subjects)
 const SUBJECT_CLASSES = {
   CCNA: 'subj-ccna',
   Wargame: 'subj-wargame',
@@ -549,13 +610,17 @@ const SUBJECT_CLASSES = {
 
 // ── State ──
 let topics = [];
+let subjects = [...DEFAULT_SUBJECTS];
 let activeFilter = 'All';
+let selectedColor = SUBJECT_COLORS[0];
 let settings = { apiKey: '$69866891ae596e708f16d18c', binId: '', autoSync: true };
 
 // ── Init ──
 function init() {
   loadSettings();
+  loadSubjects();
   loadTopics();
+  renderSubjectSelect();
   renderTabs();
   render();
   updateSyncStatus();
@@ -591,6 +656,85 @@ function saveTopics() {
   }
 }
 
+// ── Subjects storage ──
+function loadSubjects() {
+  try {
+    const s = localStorage.getItem('sr_subjects');
+    if (s) subjects = JSON.parse(s);
+  } catch(e) { subjects = [...DEFAULT_SUBJECTS]; }
+}
+
+function saveSubjects() {
+  localStorage.setItem('sr_subjects', JSON.stringify(subjects));
+  if (settings.apiKey && settings.autoSync) {
+    pushToCloud();
+  }
+}
+
+function getSubjectNames() {
+  return subjects.map(s => s.name);
+}
+
+function getSubjectColor(name) {
+  const s = subjects.find(x => x.name === name);
+  return s ? s.color : '#64748b';
+}
+
+function renderSubjectSelect() {
+  const select = document.getElementById('subjectSelect');
+  select.innerHTML = subjects.map(s =>
+    `<option value="${escapeHtml(s.name)}">${escapeHtml(s.name)}</option>`
+  ).join('');
+}
+
+// ── Add Subject modal ──
+function openAddSubject() {
+  selectedColor = SUBJECT_COLORS[0];
+  document.getElementById('subjectNameInput').value = '';
+  renderColorGrid();
+  document.getElementById('addSubjectModal').classList.add('open');
+  document.getElementById('subjectNameInput').focus();
+}
+
+function closeAddSubject() {
+  document.getElementById('addSubjectModal').classList.remove('open');
+}
+
+function renderColorGrid() {
+  const grid = document.getElementById('colorGrid');
+  grid.innerHTML = SUBJECT_COLORS.map(c =>
+    `<div class="color-swatch${c === selectedColor ? ' selected' : ''}"
+          style="background:${c};"
+          onclick="pickColor('${c}')"></div>`
+  ).join('');
+}
+
+function pickColor(c) {
+  selectedColor = c;
+  renderColorGrid();
+}
+
+function confirmAddSubject() {
+  const name = document.getElementById('subjectNameInput').value.trim();
+  if (!name) {
+    document.getElementById('subjectNameInput').focus();
+    return;
+  }
+  if (subjects.find(s => s.name.toLowerCase() === name.toLowerCase())) {
+    toast('Subject already exists');
+    return;
+  }
+  subjects.push({ name, color: selectedColor });
+  saveSubjects();
+  renderSubjectSelect();
+  renderTabs();
+  render();
+  closeAddSubject();
+  // Auto-select the new subject in dropdown
+  document.getElementById('subjectSelect').value = name;
+  toast(`Subject "${name}" added`);
+}
+
 // ── JSONBin API ──
 async function pushToCloud() {
   if (!settings.apiKey) return;
@@ -599,40 +743,51 @@ async function pushToCloud() {
   dot.className = 'sync-dot syncing';
   label.textContent = 'Syncing...';
 
+  const payload = { topics, subjects, updatedAt: new Date().toISOString() };
+
   try {
+    let res;
     if (!settings.binId) {
       // Create new bin
-      const res = await fetch('https://api.jsonbin.io/v3/b', {
+      res = await fetch('https://api.jsonbin.io/v3/b', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'X-Access-Key': settings.apiKey,
           'X-Bin-Name': 'sr-tracker'
         },
-        body: JSON.stringify({ topics, updatedAt: new Date().toISOString() })
+        body: JSON.stringify(payload)
       });
-      const data = await res.json();
-      if (data.metadata) {
-        settings.binId = data.metadata.id;
-        saveSettingsToStorage();
-        document.getElementById('binIdInput').value = settings.binId;
-      }
     } else {
-      await fetch(`https://api.jsonbin.io/v3/b/${settings.binId}`, {
+      res = await fetch(`https://api.jsonbin.io/v3/b/${settings.binId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
           'X-Access-Key': settings.apiKey
         },
-        body: JSON.stringify({ topics, updatedAt: new Date().toISOString() })
+        body: JSON.stringify(payload)
       });
     }
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      throw new Error(data.message || `HTTP ${res.status}`);
+    }
+
+    if (!settings.binId && data.metadata) {
+      settings.binId = data.metadata.id;
+      saveSettingsToStorage();
+      document.getElementById('binIdInput').value = settings.binId;
+    }
+
     dot.className = 'sync-dot online';
     label.textContent = 'Synced';
   } catch(e) {
     dot.className = 'sync-dot';
     label.textContent = 'Sync error';
-    toast('Sync failed - saved locally');
+    console.error('Push failed:', e);
+    toast('Sync failed: ' + e.message);
   }
 }
 
@@ -642,21 +797,35 @@ async function pullFromCloud() {
     const res = await fetch(`https://api.jsonbin.io/v3/b/${settings.binId}/latest`, {
       headers: { 'X-Access-Key': settings.apiKey }
     });
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.message || `HTTP ${res.status}`);
+    }
     const data = await res.json();
-    if (data.record && data.record.topics) {
-      // Merge: cloud wins if it has more recent data
-      const cloudTopics = data.record.topics;
-      if (cloudTopics.length > 0) {
-        // Simple merge: use cloud data, then merge any local-only entries
+    if (data.record) {
+      // Merge topics
+      if (data.record.topics && data.record.topics.length > 0) {
+        const cloudTopics = data.record.topics;
         const cloudIds = new Set(cloudTopics.map(t => t.id));
         const localOnly = topics.filter(t => !cloudIds.has(t.id));
         topics = [...cloudTopics, ...localOnly];
         localStorage.setItem('sr_topics', JSON.stringify(topics));
-        render();
       }
+      // Merge subjects
+      if (data.record.subjects && data.record.subjects.length > 0) {
+        const cloudSubjects = data.record.subjects;
+        const cloudNames = new Set(cloudSubjects.map(s => s.name));
+        const localOnlySubj = subjects.filter(s => !cloudNames.has(s.name));
+        subjects = [...cloudSubjects, ...localOnlySubj];
+        localStorage.setItem('sr_subjects', JSON.stringify(subjects));
+        renderSubjectSelect();
+      }
+      renderTabs();
+      render();
     }
     updateSyncStatus();
   } catch(e) {
+    console.error('Pull failed:', e);
     updateSyncStatus();
   }
 }
@@ -780,12 +949,13 @@ function categorize(topic) {
 // ── Render ──
 function renderTabs() {
   const container = document.getElementById('tabs');
+  const names = getSubjectNames();
   const counts = { All: topics.length };
-  SUBJECTS.forEach(s => { counts[s] = topics.filter(t => t.subject === s).length; });
+  names.forEach(s => { counts[s] = topics.filter(t => t.subject === s).length; });
 
-  container.innerHTML = ['All', ...SUBJECTS].map(s =>
-    `<button class="tab${activeFilter === s ? ' active' : ''}" onclick="setFilter('${s}')">
-      ${s}<span class="count">${counts[s]}</span>
+  container.innerHTML = ['All', ...names].map(s =>
+    `<button class="tab${activeFilter === s ? ' active' : ''}" onclick="setFilter('${escapeHtml(s).replace(/'/g, "\\'")}')">
+      ${escapeHtml(s)}<span class="count">${counts[s]}</span>
     </button>`
   ).join('');
 }
@@ -855,7 +1025,7 @@ function render() {
 }
 
 function renderCard(t, category) {
-  const subjClass = SUBJECT_CLASSES[t.subject] || '';
+  const subjColor = getSubjectColor(t.subject);
   const cardClass = category === 'overdue' ? 'overdue'
     : category === 'today' ? 'due-today'
     : category === 'soon' ? 'due-soon'
@@ -874,7 +1044,7 @@ function renderCard(t, category) {
   return `<div class="topic-card ${cardClass}">
     <div class="topic-info">
       <div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;">
-        <span class="topic-subject ${subjClass}">${t.subject}</span>
+        <span class="topic-subject" style="background:${subjColor};">${escapeHtml(t.subject)}</span>
         <span class="topic-name">${escapeHtml(t.name)}</span>
       </div>
       <div class="topic-meta">
@@ -931,7 +1101,7 @@ function saveSettings() {
 
 // ── Export / Import ──
 function exportData() {
-  const blob = new Blob([JSON.stringify({ topics, settings: { binId: settings.binId }, exportedAt: new Date().toISOString() }, null, 2)], { type: 'application/json' });
+  const blob = new Blob([JSON.stringify({ topics, subjects, settings: { binId: settings.binId }, exportedAt: new Date().toISOString() }, null, 2)], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
@@ -950,6 +1120,11 @@ function importData(event) {
       const data = JSON.parse(e.target.result);
       if (data.topics && Array.isArray(data.topics)) {
         topics = data.topics;
+        if (data.subjects && Array.isArray(data.subjects)) {
+          subjects = data.subjects;
+          saveSubjects();
+          renderSubjectSelect();
+        }
         saveTopics();
         renderTabs();
         render();
@@ -980,9 +1155,15 @@ document.getElementById('topicInput').addEventListener('keydown', function(e) {
   if (e.key === 'Enter') addTopic();
 });
 
-// Close modal on overlay click
+// Close modals on overlay click
 document.getElementById('settingsModal').addEventListener('click', function(e) {
   if (e.target === this) closeSettings();
+});
+document.getElementById('addSubjectModal').addEventListener('click', function(e) {
+  if (e.target === this) closeAddSubject();
+});
+document.getElementById('subjectNameInput').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') confirmAddSubject();
 });
 
 // ── Start ──
