@@ -762,7 +762,7 @@ function renderSubjectList() {
       <span class="color-dot" style="background:${s.color};"></span>
       <span class="subject-name">${escapeHtml(s.name)}</span>
       <button class="btn-edit-subject" onclick="startEditSubject(${i})" title="Edit">Edit</button>
-      <button class="btn-del-subject" onclick="deleteSubject(${i})" title="Delete">&times;</button>
+      <button class="btn-del-subject" onclick="deleteSubject(${i})" title="Delete">Delete</button>
     </div>`;
   }).join('');
   // Focus edit input if editing
