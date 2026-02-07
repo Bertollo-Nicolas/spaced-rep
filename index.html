@@ -377,7 +377,38 @@ body {
   .topic-actions { width: 100%; justify-content: flex-end; }
   .btn-sync-profile span { display: none; }
   .header-right { gap: 0.4rem; }
+  .roadmap-pipeline { flex-direction: column; }
+  .roadmap-col { min-width: 0; }
 }
+
+/* Roadmap view */
+.roadmap-container { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 0.8rem; margin-bottom: 1rem; overflow-x: auto; }
+.roadmap-pipeline { display: flex; gap: 6px; min-height: 200px; }
+.roadmap-col {
+  flex: 1; min-width: 110px; display: flex; flex-direction: column;
+  background: var(--bg-input); border-radius: 8px; overflow: hidden;
+}
+.roadmap-col-header {
+  padding: 0.4rem 0.5rem; font-size: 0.7rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.04em; text-align: center;
+  color: #fff; display: flex; align-items: center; justify-content: center; gap: 0.3rem;
+}
+.roadmap-col-header .col-count {
+  background: rgba(255,255,255,0.25); padding: 0 0.35rem; border-radius: 6px; font-size: 0.6rem;
+}
+.roadmap-col-body { flex: 1; padding: 4px; display: flex; flex-direction: column; gap: 3px; overflow-y: auto; max-height: 400px; }
+.roadmap-item {
+  padding: 0.35rem 0.45rem; border-radius: 5px; font-size: 0.7rem; cursor: pointer;
+  background: var(--bg-card); border: 1px solid var(--border);
+  transition: all 0.15s; animation: cardEnter 0.2s ease-out backwards;
+}
+.roadmap-item:hover { border-color: var(--accent); transform: translateY(-1px); }
+.roadmap-item .ri-name { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.roadmap-item .ri-subject { font-size: 0.6rem; padding: 1px 4px; border-radius: 3px; color: #fff; display: inline-block; margin-top: 2px; }
+.roadmap-item .ri-due { font-size: 0.6rem; color: var(--text-dim); margin-top: 1px; }
+.roadmap-item.ri-overdue { border-left: 2px solid var(--overdue); }
+.roadmap-item.ri-today { border-left: 2px solid var(--due-today); }
+.roadmap-arrow { display: flex; align-items: center; color: var(--border); font-size: 1rem; flex-shrink: 0; }
 </style>
 </head>
 <body>
@@ -413,6 +444,7 @@ body {
     <button class="view-btn active" id="viewList" onclick="setView('list')">List</button>
     <button class="view-btn" id="viewCalendar" onclick="setView('calendar')">Calendar</button>
     <button class="view-btn" id="viewWeek" onclick="setView('week')">Week</button>
+    <button class="view-btn" id="viewRoadmap" onclick="setView('roadmap')">Roadmap</button>
   </div>
 
   <div class="tabs" id="tabs"></div>
@@ -433,6 +465,7 @@ body {
   </div>
 
   <div id="calendarView" style="display:none;"></div>
+  <div id="roadmapView" style="display:none;"></div>
   <div id="topicList"></div>
 </div>
 
@@ -1039,10 +1072,13 @@ function setView(view) {
   document.getElementById('viewList').classList.toggle('active', view === 'list');
   document.getElementById('viewCalendar').classList.toggle('active', view === 'calendar');
   document.getElementById('viewWeek').classList.toggle('active', view === 'week');
+  document.getElementById('viewRoadmap').classList.toggle('active', view === 'roadmap');
   document.getElementById('topicList').style.display = view === 'list' ? '' : 'none';
   document.getElementById('calendarView').style.display = (view === 'calendar' || view === 'week') ? '' : 'none';
+  document.getElementById('roadmapView').style.display = view === 'roadmap' ? '' : 'none';
   if (view === 'calendar') renderCalendar();
   if (view === 'week') renderWeekView();
+  if (view === 'roadmap') renderRoadmap();
 }
 
 // ── Calendar (Month) ──
@@ -1187,6 +1223,77 @@ function calendarNext() { calendarMonth++; if (calendarMonth > 11) { calendarMon
 function weekPrev() { calendarWeekStart = addDays(calendarWeekStart, -7); selectedCalendarDay = null; renderWeekView(); }
 function weekNext() { calendarWeekStart = addDays(calendarWeekStart, 7); selectedCalendarDay = null; renderWeekView(); }
 
+// ── Roadmap ──
+function renderRoadmap() {
+  const container = document.getElementById('roadmapView');
+  const filtered = activeFilter === 'All' ? [...topics] : topics.filter(t => t.subject === activeFilter);
+  if (searchQuery) {
+    const q = searchQuery.toLowerCase();
+    filtered.splice(0, filtered.length, ...filtered.filter(t => t.name.toLowerCase().includes(q) || t.subject.toLowerCase().includes(q)));
+  }
+
+  const levels = [1, 2, 3, 4, 5, 6, 7];
+  const levelNames = { 1: 'Lv 1', 2: 'Lv 2', 3: 'Lv 3', 4: 'Lv 4', 5: 'Lv 5', 6: 'Lv 6', 7: 'Mastered' };
+  const levelColors = { 1: '#ef4444', 2: '#f59e0b', 3: '#f97316', 4: '#3b82f6', 5: '#8b5cf6', 6: '#6366f1', 7: '#22c55e' };
+  const levelIntervals = { 1: '1d', 2: '3d', 3: '7d', 4: '14d', 5: '30d', 6: '60d', 7: 'Done' };
+
+  const buckets = {};
+  levels.forEach(l => { buckets[l] = []; });
+  filtered.forEach(t => { if (buckets[t.level]) buckets[t.level].push(t); });
+
+  let html = '<div class="roadmap-container"><div class="roadmap-pipeline">';
+
+  levels.forEach((lv, idx) => {
+    const items = buckets[lv];
+    const color = levelColors[lv];
+
+    if (idx > 0) html += '<div class="roadmap-arrow">&#8250;</div>';
+
+    html += `<div class="roadmap-col">
+      <div class="roadmap-col-header" style="background:${color};">
+        ${levelNames[lv]}<span class="col-count">${items.length}</span>
+      </div>
+      <div class="roadmap-col-body">`;
+
+    if (items.length === 0) {
+      html += '<div style="text-align:center;padding:1rem 0.3rem;font-size:0.65rem;color:var(--text-dim);">Empty</div>';
+    } else {
+      items.forEach((t, i) => {
+        const cat = lv === 7 ? '' : categorize(t);
+        const statusCls = cat === 'overdue' ? ' ri-overdue' : cat === 'today' ? ' ri-today' : '';
+        const dueText = lv === 7 ? '' : formatDate(t.nextReview);
+        html += `<div class="roadmap-item${statusCls}" style="animation-delay:${i * 30}ms;" onclick="openEditTopic('${t.id}')" title="${escapeHtml(t.name)}">
+          <div class="ri-name">${escapeHtml(t.name)}</div>
+          <span class="ri-subject" style="background:${getSubjectColor(t.subject)};">${escapeHtml(t.subject)}</span>
+          ${dueText ? `<div class="ri-due">${dueText}</div>` : ''}
+        </div>`;
+      });
+    }
+
+    html += '</div></div>';
+  });
+
+  html += '</div>';
+
+  // Summary bar
+  const total = filtered.length;
+  if (total > 0) {
+    html += '<div style="display:flex;gap:2px;margin-top:0.6rem;border-radius:4px;overflow:hidden;height:8px;">';
+    levels.forEach(lv => {
+      const pct = (buckets[lv].length / total) * 100;
+      if (pct > 0) html += `<div style="width:${pct}%;background:${levelColors[lv]};" title="Lv${lv}: ${buckets[lv].length}"></div>`;
+    });
+    html += '</div>';
+    html += `<div style="display:flex;justify-content:space-between;font-size:0.65rem;color:var(--text-dim);margin-top:0.3rem;">
+      <span>${total} topic${total !== 1 ? 's' : ''}</span>
+      <span>${buckets[7].length} mastered (${total > 0 ? Math.round((buckets[7].length / total) * 100) : 0}%)</span>
+    </div>`;
+  }
+
+  html += '</div>';
+  container.innerHTML = html;
+}
+
 // ── Render ──
 function renderTabs() {
   const container = document.getElementById('tabs');
@@ -1253,6 +1360,7 @@ function render() {
     container.innerHTML = `<div class="empty-state"><div class="icon">&#128218;</div><p>${searchQuery ? 'No matching topics' : 'No topics yet. Add one above!'}</p></div>`;
     if (currentView === 'calendar') renderCalendar();
     if (currentView === 'week') renderWeekView();
+    if (currentView === 'roadmap') renderRoadmap();
     return;
   }
   let html = '';
@@ -1265,6 +1373,7 @@ function render() {
   container.innerHTML = html;
   if (currentView === 'calendar') renderCalendar();
   if (currentView === 'week') renderWeekView();
+  if (currentView === 'roadmap') renderRoadmap();
 }
 
 function renderCard(t, category, index) {
