@@ -49,7 +49,7 @@ body {
   color: var(--text);
   min-height: 100vh;
   line-height: 1.5;
-  transition: background 0.2s, color 0.2s;
+  transition: background 0.3s, color 0.3s;
 }
 
 /* Header */
@@ -66,7 +66,7 @@ body {
 }
 .header h1 { font-size: 1.15rem; font-weight: 700; color: var(--accent); letter-spacing: -0.02em; }
 .header-right { display: flex; align-items: center; gap: 0.7rem; }
-.header-actions { display: flex; gap: 0.4rem; }
+.header-actions { display: flex; gap: 0.4rem; align-items: center; }
 .icon-btn {
   background: transparent;
   border: 1px solid var(--border);
@@ -77,6 +77,7 @@ body {
   display: flex; align-items: center; justify-content: center;
   font-size: 1rem;
   transition: all 0.15s;
+  position: relative;
 }
 .icon-btn:hover { background: var(--bg-hover); color: var(--text); border-color: var(--accent); }
 
@@ -90,6 +91,37 @@ body {
   display: flex; align-items: center; gap: 0.2rem;
 }
 
+/* Sync Profile button */
+.btn-sync-profile {
+  background: var(--accent);
+  border: none;
+  border-radius: var(--radius);
+  color: #fff;
+  padding: 0.4rem 0.7rem;
+  font-weight: 600;
+  font-size: 0.72rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+.btn-sync-profile:hover { background: var(--accent-hover); transform: translateY(-1px); }
+.btn-sync-profile:active { transform: translateY(0); }
+
+/* Notification badge */
+.notif-badge {
+  position: absolute;
+  top: -2px; right: -2px;
+  width: 8px; height: 8px;
+  background: var(--fail);
+  border-radius: 50%;
+  border: 2px solid var(--bg-card);
+  display: none;
+}
+.notif-badge.show { display: block; }
+
 /* View toggle */
 .view-toggle { display: flex; gap: 0.4rem; margin-bottom: 1rem; }
 .view-btn {
@@ -102,7 +134,8 @@ body {
 
 /* Stats row */
 .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.6rem; margin-bottom: 1rem; }
-.stat-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 0.7rem; text-align: center; }
+.stat-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 0.7rem; text-align: center; transition: transform 0.2s, box-shadow 0.2s; }
+.stat-card:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
 .stat-num { font-size: 1.5rem; font-weight: 700; line-height: 1.2; }
 .stat-label { font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.05em; }
 .stat-overdue .stat-num { color: var(--overdue); }
@@ -110,16 +143,20 @@ body {
 .stat-soon .stat-num { color: var(--due-soon); }
 .stat-mastered .stat-num { color: var(--mastered); }
 
-/* Subject stats bar */
+/* Subject stats bar with progress */
 .subject-stats { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 1rem; }
 .subject-stat {
-  display: flex; align-items: center; gap: 0.3rem;
-  padding: 0.25rem 0.6rem; border-radius: 6px;
+  display: flex; align-items: center; gap: 0.35rem;
+  padding: 0.3rem 0.6rem; border-radius: 6px;
   background: var(--bg-card); border: 1px solid var(--border);
   font-size: 0.7rem; color: var(--text-dim);
+  transition: transform 0.15s;
 }
-.subject-stat .ss-dot { width: 6px; height: 6px; border-radius: 50%; }
+.subject-stat:hover { transform: translateY(-1px); }
+.subject-stat .ss-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
 .subject-stat .ss-count { font-weight: 600; color: var(--text); }
+.subject-stat .ss-progress { width: 40px; height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; }
+.subject-stat .ss-progress-fill { height: 100%; border-radius: 2px; transition: width 0.4s ease; }
 
 /* Tabs */
 .tabs { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 1rem; }
@@ -127,9 +164,9 @@ body {
   padding: 0.45rem 0.8rem; border-radius: var(--radius);
   border: 1px solid var(--border); background: var(--bg-card);
   color: var(--text-dim); cursor: pointer; font-size: 0.8rem; font-weight: 500;
-  white-space: nowrap; transition: all 0.15s; display: flex; align-items: center; gap: 0.4rem;
+  white-space: nowrap; transition: all 0.2s; display: flex; align-items: center; gap: 0.4rem;
 }
-.tab:hover { border-color: var(--accent); color: var(--text); }
+.tab:hover { border-color: var(--accent); color: var(--text); transform: translateY(-1px); }
 .tab.active { color: #fff; }
 .tab .color-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
 .tab .count { display: inline-block; background: rgba(255,255,255,0.15); padding: 0 0.4rem; border-radius: 8px; font-size: 0.7rem; }
@@ -140,9 +177,9 @@ body {
 .search-input {
   width: 100%; background: var(--bg-card); border: 1px solid var(--border);
   border-radius: var(--radius); padding: 0.5rem 0.75rem; color: var(--text);
-  font-size: 0.85rem; outline: none; transition: border-color 0.15s;
+  font-size: 0.85rem; outline: none; transition: border-color 0.2s, box-shadow 0.2s;
 }
-.search-input:focus { border-color: var(--accent); }
+.search-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(108,99,255,0.15); }
 
 /* Section headers */
 .section-header {
@@ -156,23 +193,34 @@ body {
 .section-header.later .dot { background: var(--text-dim); }
 .section-header.mastered .dot { background: var(--mastered); }
 
-/* Topic cards */
+/* Topic cards with animations */
+@keyframes cardEnter {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes cardExit {
+  from { opacity: 1; transform: scale(1); }
+  to { opacity: 0; transform: scale(0.95) translateX(20px); }
+}
 .topic-card {
   background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius);
   padding: 0.75rem 0.9rem; margin-bottom: 0.5rem;
-  display: flex; align-items: center; gap: 0.7rem; transition: all 0.15s;
+  display: flex; align-items: center; gap: 0.7rem;
+  transition: all 0.2s;
+  animation: cardEnter 0.3s ease-out backwards;
 }
-.topic-card:hover { border-color: #3a3e4a; }
+.topic-card:hover { border-color: #3a3e4a; transform: translateX(3px); }
 .topic-card.overdue { border-left: 3px solid var(--overdue); }
 .topic-card.due-today { border-left: 3px solid var(--due-today); }
 .topic-card.due-soon { border-left: 3px solid var(--due-soon); }
 .topic-card.mastered-card { border-left: 3px solid var(--mastered); opacity: 0.8; }
+.topic-card.removing { animation: cardExit 0.3s ease-in forwards; pointer-events: none; }
 .topic-info { flex: 1; min-width: 0; }
 .topic-name { font-weight: 600; font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .topic-meta { font-size: 0.75rem; color: var(--text-dim); display: flex; flex-wrap: wrap; gap: 0.3rem 0.8rem; margin-top: 0.15rem; }
 .topic-subject { display: inline-block; padding: 0.1rem 0.45rem; border-radius: 4px; font-size: 0.7rem; font-weight: 600; color: #fff; }
 .level-pips { display: flex; gap: 3px; align-items: center; }
-.pip { width: 8px; height: 8px; border-radius: 2px; background: var(--border); transition: background 0.15s; }
+.pip { width: 8px; height: 8px; border-radius: 2px; background: var(--border); transition: background 0.2s; }
 .pip.filled { background: var(--accent); }
 .pip.mastered-pip { background: var(--mastered); }
 
@@ -180,12 +228,13 @@ body {
 .topic-actions { display: flex; gap: 0.35rem; flex-shrink: 0; }
 .btn-pass, .btn-fail, .btn-del, .btn-edit {
   border: none; border-radius: 6px; cursor: pointer;
-  font-size: 0.78rem; font-weight: 600; padding: 0.4rem 0.65rem; transition: all 0.15s;
+  font-size: 0.78rem; font-weight: 600; padding: 0.4rem 0.65rem;
+  transition: all 0.2s;
 }
 .btn-pass { background: var(--success-dim); color: var(--success); }
-.btn-pass:hover { background: var(--success); color: #fff; }
+.btn-pass:hover { background: var(--success); color: #fff; transform: scale(1.05); }
 .btn-fail { background: var(--fail-dim); color: var(--fail); }
-.btn-fail:hover { background: var(--fail); color: #fff; }
+.btn-fail:hover { background: var(--fail); color: #fff; transform: scale(1.05); }
 .btn-edit { background: transparent; color: var(--text-dim); padding: 0.4rem; font-size: 0.85rem; }
 .btn-edit:hover { color: var(--accent); }
 .btn-del { background: transparent; color: var(--text-dim); padding: 0.4rem; font-size: 0.9rem; }
@@ -194,12 +243,12 @@ body {
 /* Add topic area */
 .add-section { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 0.9rem; margin-bottom: 1rem; }
 .add-row { display: flex; gap: 0.5rem; }
-.add-input { flex: 1; background: var(--bg-input); border: 1px solid var(--border); border-radius: 8px; padding: 0.55rem 0.75rem; color: var(--text); font-size: 0.9rem; outline: none; transition: border-color 0.15s; }
+.add-input { flex: 1; background: var(--bg-input); border: 1px solid var(--border); border-radius: 8px; padding: 0.55rem 0.75rem; color: var(--text); font-size: 0.9rem; outline: none; transition: border-color 0.2s; }
 .add-input:focus { border-color: var(--accent); }
 .add-select { background: var(--bg-input); border: 1px solid var(--border); border-radius: 8px; padding: 0.55rem 0.75rem; color: var(--text); font-size: 0.85rem; outline: none; cursor: pointer; min-width: 120px; }
 .add-select:focus { border-color: var(--accent); }
-.btn-add { background: var(--accent); border: none; border-radius: 8px; color: #fff; padding: 0.55rem 1rem; font-weight: 600; font-size: 0.9rem; cursor: pointer; white-space: nowrap; transition: background 0.15s; }
-.btn-add:hover { background: var(--accent-hover); }
+.btn-add { background: var(--accent); border: none; border-radius: 8px; color: #fff; padding: 0.55rem 1rem; font-weight: 600; font-size: 0.9rem; cursor: pointer; white-space: nowrap; transition: all 0.2s; }
+.btn-add:hover { background: var(--accent-hover); transform: translateY(-1px); }
 .add-subject-row { display: flex; gap: 0.5rem; margin-top: 0.5rem; }
 .btn-add-subject { background: transparent; border: 1px dashed var(--border); border-radius: 8px; color: var(--text-dim); padding: 0.4rem 0.75rem; font-size: 0.8rem; cursor: pointer; transition: all 0.15s; white-space: nowrap; }
 .btn-add-subject:hover { border-color: var(--accent); color: var(--accent); }
@@ -210,7 +259,8 @@ body {
 /* Modal */
 .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 200; align-items: center; justify-content: center; padding: 1rem; }
 .modal-overlay.open { display: flex; }
-.modal { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; width: 100%; max-width: 420px; box-shadow: 0 8px 32px rgba(0,0,0,0.5); }
+.modal { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; width: 100%; max-width: 420px; box-shadow: 0 8px 32px rgba(0,0,0,0.5); animation: modalEnter 0.2s ease-out; }
+@keyframes modalEnter { from { opacity: 0; transform: scale(0.95) translateY(10px); } to { opacity: 1; transform: scale(1) translateY(0); } }
 .modal h2 { font-size: 1.1rem; margin-bottom: 1rem; }
 .modal label { display: block; font-size: 0.8rem; color: var(--text-dim); margin-bottom: 0.3rem; margin-top: 0.8rem; }
 .modal input[type="text"], .modal select { width: 100%; background: var(--bg-input); border: 1px solid var(--border); border-radius: 8px; padding: 0.55rem 0.75rem; color: var(--text); font-size: 0.9rem; outline: none; }
@@ -218,20 +268,49 @@ body {
 .modal-actions { display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 1.2rem; }
 .btn-secondary { background: var(--bg-hover); border: 1px solid var(--border); border-radius: 8px; color: var(--text); padding: 0.5rem 1rem; font-size: 0.85rem; cursor: pointer; transition: all 0.15s; }
 .btn-secondary:hover { border-color: var(--text-dim); }
-.btn-primary { background: var(--accent); border: none; border-radius: 8px; color: #fff; padding: 0.5rem 1rem; font-weight: 600; font-size: 0.85rem; cursor: pointer; transition: background 0.15s; }
+.btn-primary { background: var(--accent); border: none; border-radius: 8px; color: #fff; padding: 0.5rem 1rem; font-weight: 600; font-size: 0.85rem; cursor: pointer; transition: all 0.2s; }
 .btn-primary:hover { background: var(--accent-hover); }
+.btn-danger { background: var(--fail); border: none; border-radius: 8px; color: #fff; padding: 0.5rem 1rem; font-weight: 600; font-size: 0.85rem; cursor: pointer; transition: all 0.2s; }
+.btn-danger:hover { background: #dc2626; }
 
 /* Color grid & subject list */
 .color-grid { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.4rem; }
 .color-swatch { width: 28px; height: 28px; border-radius: 6px; border: 2px solid transparent; cursor: pointer; transition: all 0.15s; }
 .color-swatch:hover { transform: scale(1.15); }
 .color-swatch.selected { border-color: #fff; box-shadow: 0 0 0 2px var(--accent); }
-.subject-list { margin-top: 0.8rem; display: flex; flex-direction: column; gap: 0.4rem; max-height: 200px; overflow-y: auto; }
-.subject-item { display: flex; align-items: center; gap: 0.5rem; padding: 0.4rem 0.6rem; background: var(--bg-input); border-radius: 6px; font-size: 0.85rem; }
+.subject-list { margin-top: 0.8rem; display: flex; flex-direction: column; gap: 0.4rem; max-height: 260px; overflow-y: auto; }
+.subject-item { display: flex; align-items: center; gap: 0.5rem; padding: 0.4rem 0.6rem; background: var(--bg-input); border-radius: 6px; font-size: 0.85rem; transition: background 0.15s; }
+.subject-item:hover { background: var(--bg-hover); }
 .subject-item .color-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
 .subject-item .subject-name { flex: 1; }
+.subject-item .btn-edit-subject { background: transparent; border: none; color: var(--text-dim); cursor: pointer; font-size: 0.85rem; padding: 0 0.3rem; transition: color 0.15s; }
+.subject-item .btn-edit-subject:hover { color: var(--accent); }
 .subject-item .btn-del-subject { background: transparent; border: none; color: var(--text-dim); cursor: pointer; font-size: 1rem; padding: 0 0.3rem; transition: color 0.15s; }
 .subject-item .btn-del-subject:hover { color: var(--fail); }
+
+/* Subject edit inline */
+.subject-edit-form { display: flex; flex-direction: column; gap: 0.4rem; padding: 0.5rem 0.6rem; background: var(--bg-hover); border-radius: 6px; border: 1px solid var(--accent); animation: cardEnter 0.2s ease-out; }
+.subject-edit-top { display: flex; gap: 0.4rem; align-items: center; }
+.subject-edit-top input { flex: 1; background: var(--bg-input); border: 1px solid var(--border); border-radius: 4px; padding: 0.3rem 0.5rem; color: var(--text); font-size: 0.82rem; outline: none; }
+.subject-edit-top input:focus { border-color: var(--accent); }
+.subject-edit-colors { display: flex; flex-wrap: wrap; gap: 3px; }
+.mini-swatch { width: 18px; height: 18px; border-radius: 4px; border: 2px solid transparent; cursor: pointer; transition: all 0.1s; }
+.mini-swatch:hover { transform: scale(1.15); }
+.mini-swatch.selected { border-color: #fff; box-shadow: 0 0 0 1px var(--accent); }
+.subject-edit-actions { display: flex; gap: 0.3rem; justify-content: flex-end; }
+.subject-edit-actions button { padding: 0.25rem 0.6rem; font-size: 0.75rem; border-radius: 4px; cursor: pointer; font-weight: 600; border: none; transition: all 0.15s; }
+.subject-edit-actions .btn-save-edit { background: var(--accent); color: #fff; }
+.subject-edit-actions .btn-save-edit:hover { background: var(--accent-hover); }
+.subject-edit-actions .btn-cancel-edit { background: var(--bg-input); color: var(--text-dim); border: 1px solid var(--border); }
+
+/* Confirmation dialog */
+.confirm-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.65); z-index: 250; align-items: center; justify-content: center; padding: 1rem; }
+.confirm-overlay.open { display: flex; }
+.confirm-box { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; max-width: 380px; width: 100%; box-shadow: 0 8px 32px rgba(0,0,0,0.5); animation: modalEnter 0.2s ease-out; }
+.confirm-box .confirm-icon { font-size: 2rem; text-align: center; margin-bottom: 0.5rem; }
+.confirm-box .confirm-msg { font-size: 0.95rem; font-weight: 600; margin-bottom: 0.4rem; text-align: center; }
+.confirm-box .confirm-detail { font-size: 0.8rem; color: var(--text-dim); text-align: center; margin-bottom: 1.2rem; line-height: 1.5; }
+.confirm-box .confirm-actions { display: flex; gap: 0.5rem; justify-content: center; }
 
 /* Sync indicator */
 .sync-status { font-size: 0.7rem; color: var(--text-dim); display: flex; align-items: center; gap: 0.3rem; }
@@ -246,27 +325,52 @@ body {
 .toast .undo-btn { background: var(--accent); color: #fff; border: none; border-radius: 6px; padding: 0.2rem 0.6rem; font-size: 0.75rem; font-weight: 600; cursor: pointer; }
 @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-/* Calendar */
-.calendar-container { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem; margin-bottom: 1rem; }
-.calendar-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.8rem; }
-.calendar-nav button { background: transparent; border: 1px solid var(--border); color: var(--text-dim); border-radius: 6px; padding: 0.3rem 0.6rem; cursor: pointer; font-size: 0.85rem; transition: all 0.15s; }
+/* Calendar (compact) */
+.calendar-container { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 0.8rem; margin-bottom: 1rem; }
+.calendar-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem; }
+.calendar-nav button { background: transparent; border: 1px solid var(--border); color: var(--text-dim); border-radius: 6px; padding: 0.25rem 0.5rem; cursor: pointer; font-size: 0.8rem; transition: all 0.15s; }
 .calendar-nav button:hover { border-color: var(--accent); color: var(--text); }
-.calendar-nav .month-label { font-weight: 600; font-size: 0.95rem; }
-.calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
-.calendar-day-header { text-align: center; font-size: 0.65rem; color: var(--text-dim); font-weight: 600; text-transform: uppercase; padding: 0.3rem 0; }
-.calendar-day { aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 6px; font-size: 0.75rem; color: var(--text-dim); position: relative; cursor: pointer; min-height: 36px; transition: background 0.1s; }
+.calendar-nav .month-label { font-weight: 600; font-size: 0.9rem; }
+.calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 1px; }
+.calendar-day-header { text-align: center; font-size: 0.6rem; color: var(--text-dim); font-weight: 600; text-transform: uppercase; padding: 0.2rem 0; }
+.calendar-day {
+  min-height: 32px; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  border-radius: 4px; font-size: 0.7rem; color: var(--text-dim); position: relative;
+  cursor: pointer; padding: 2px; transition: all 0.15s;
+}
 .calendar-day:hover { background: var(--bg-hover); }
 .calendar-day.other-month { opacity: 0.3; pointer-events: none; }
 .calendar-day.today-cell { border: 1px solid var(--accent); color: var(--text); }
 .calendar-day.selected-day { background: var(--accent); color: #fff; }
-.calendar-day .day-num { font-weight: 500; }
-.calendar-day .day-dots { display: flex; gap: 2px; margin-top: 2px; flex-wrap: wrap; justify-content: center; max-width: 100%; }
-.calendar-day .day-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
-.calendar-day .day-count { font-size: 0.55rem; background: var(--accent); border-radius: 4px; padding: 0 3px; margin-top: 1px; line-height: 1.3; color: #fff; }
-.calendar-day-detail { background: var(--bg-input); border: 1px solid var(--border); border-radius: var(--radius); padding: 0.6rem 0.8rem; margin-top: 0.5rem; font-size: 0.8rem; }
+.calendar-day .day-num { font-weight: 500; font-size: 0.7rem; }
+.calendar-day .day-dots { display: flex; gap: 1px; margin-top: 1px; flex-wrap: wrap; justify-content: center; max-width: 100%; }
+.calendar-day .day-dot { width: 4px; height: 4px; border-radius: 50%; flex-shrink: 0; }
+.calendar-day .day-count { font-size: 0.5rem; background: var(--accent); border-radius: 3px; padding: 0 2px; margin-top: 1px; line-height: 1.3; color: #fff; }
+.calendar-day-detail { background: var(--bg-input); border: 1px solid var(--border); border-radius: var(--radius); padding: 0.5rem 0.7rem; margin-top: 0.4rem; font-size: 0.8rem; animation: cardEnter 0.2s ease-out; }
 .calendar-day-detail .detail-title { font-weight: 600; margin-bottom: 0.3rem; font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase; }
 .calendar-day-detail .detail-item { display: flex; align-items: center; gap: 0.4rem; padding: 0.2rem 0; }
 .calendar-day-detail .detail-item .topic-subject { font-size: 0.6rem; padding: 0.05rem 0.35rem; }
+
+/* Week view (compact) */
+.calendar-mode-toggle { display: flex; gap: 0.3rem; }
+.cal-mode-btn {
+  padding: 0.2rem 0.5rem; border-radius: 4px; border: 1px solid var(--border);
+  background: transparent; color: var(--text-dim); cursor: pointer; font-size: 0.7rem; font-weight: 500; transition: all 0.15s;
+}
+.cal-mode-btn:hover { border-color: var(--accent); color: var(--text); }
+.cal-mode-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+.week-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; }
+.week-day-cell {
+  min-height: 60px; padding: 0.35rem; border-radius: 6px;
+  background: var(--bg-input); border: 1px solid transparent;
+  cursor: pointer; transition: all 0.15s; font-size: 0.75rem;
+}
+.week-day-cell:hover { border-color: var(--border); background: var(--bg-hover); }
+.week-day-cell.today-cell { border-color: var(--accent); }
+.week-day-cell.selected-day { background: rgba(108,99,255,0.15); border-color: var(--accent); }
+.week-day-cell .wk-date { font-weight: 600; font-size: 0.7rem; margin-bottom: 3px; color: var(--text-dim); }
+.week-day-cell.today-cell .wk-date { color: var(--accent); }
+.week-day-cell .wk-topic { font-size: 0.65rem; padding: 1px 4px; border-radius: 3px; margin-bottom: 2px; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
 /* Responsive */
 @media (max-width: 500px) {
@@ -276,6 +380,8 @@ body {
   .btn-add { width: 100%; }
   .topic-card { flex-wrap: wrap; }
   .topic-actions { width: 100%; justify-content: flex-end; }
+  .btn-sync-profile span { display: none; }
+  .header-right { gap: 0.4rem; }
 }
 </style>
 </head>
@@ -289,7 +395,9 @@ body {
       <span class="sync-dot" id="syncDot"></span>
       <span id="syncLabel">Local</span>
     </div>
+    <button class="btn-sync-profile" onclick="syncUserProfile()" title="Sync with cloud profile">&#9729; <span>Sync Profile</span></button>
     <div class="header-actions">
+      <button class="icon-btn" id="notifBtn" onclick="toggleNotifications()" title="Notifications" aria-label="Notifications">&#128276;<span class="notif-badge" id="notifBadge"></span></button>
       <button class="icon-btn" id="themeToggle" onclick="toggleTheme()" title="Toggle theme" aria-label="Toggle theme">&#9789;</button>
       <button class="icon-btn" onclick="openSettings()" title="Settings" aria-label="Settings">&#9881;</button>
     </div>
@@ -309,6 +417,7 @@ body {
   <div class="view-toggle">
     <button class="view-btn active" id="viewList" onclick="setView('list')">List</button>
     <button class="view-btn" id="viewCalendar" onclick="setView('calendar')">Calendar</button>
+    <button class="view-btn" id="viewWeek" onclick="setView('week')">Week</button>
   </div>
 
   <div class="tabs" id="tabs"></div>
@@ -387,6 +496,19 @@ body {
   </div>
 </div>
 
+<!-- Confirmation Dialog -->
+<div class="confirm-overlay" id="confirmModal">
+  <div class="confirm-box">
+    <div class="confirm-icon" id="confirmIcon">&#9888;</div>
+    <div class="confirm-msg" id="confirmMsg"></div>
+    <div class="confirm-detail" id="confirmDetail"></div>
+    <div class="confirm-actions">
+      <button class="btn-secondary" onclick="confirmResolve(false)">Cancel</button>
+      <button class="btn-danger" id="confirmOkBtn" onclick="confirmResolve(true)">Delete</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast-container" id="toastContainer"></div>
 
 <script>
@@ -402,6 +524,7 @@ const SUBJECT_COLORS = [
   '#059669', '#7c3aed', '#0284c7', '#db2777', '#65a30d'
 ];
 const INTERVALS = { 1: 1, 2: 3, 3: 7, 4: 14, 5: 30, 6: 60, 7: Infinity };
+const SYNC_PROFILE_BIN_ID = '698674a4d0ea881f40a6723a';
 
 let topics = [];
 let subjects = [...DEFAULT_SUBJECTS];
@@ -411,8 +534,12 @@ let selectedColor = SUBJECT_COLORS[0];
 let currentView = 'list';
 let calendarMonth = new Date().getMonth();
 let calendarYear = new Date().getFullYear();
+let calendarWeekStart = getMonday(new Date());
 let selectedCalendarDay = null;
 let undoStack = [];
+let editingSubjectIndex = -1;
+let editingSubjectColor = '';
+let notificationsEnabled = false;
 let settings = { masterKey: '$2a$10$6zzHCkKXNKTBhOGsHDRkeugNKF6XB4omyZ9qvOLMi0VpvL0UEb55C', accessKey: '$2a$10$jcULTdejTl/CbGpWn7/AieINUAEhPietikVHMbXMxcc1tMQjBmTbW', binId: '', autoSync: true };
 
 // ── URL hash for binId persistence across browsers ──
@@ -429,7 +556,6 @@ function setBinIdInHash(binId) {
 function init() {
   loadTheme();
   loadSettings();
-  // Check URL hash for binId (cross-browser sync)
   const hashBin = getBinIdFromHash();
   if (hashBin && !settings.binId) {
     settings.binId = hashBin;
@@ -444,6 +570,8 @@ function init() {
   render();
   updateSyncStatus();
   updateStreak();
+  loadNotificationState();
+  checkNotifications();
 }
 
 // ── Theme ──
@@ -506,6 +634,93 @@ function performUndo() {
   toast('Undone: ' + snap.label);
 }
 
+// ── Custom Confirmation Dialog ──
+let _confirmResolve = null;
+function customConfirm(msg, detail, okLabel) {
+  return new Promise(resolve => {
+    _confirmResolve = resolve;
+    document.getElementById('confirmMsg').textContent = msg;
+    document.getElementById('confirmDetail').textContent = detail || '';
+    const okBtn = document.getElementById('confirmOkBtn');
+    okBtn.textContent = okLabel || 'Delete';
+    okBtn.className = (okLabel === 'Sync') ? 'btn-primary' : 'btn-danger';
+    document.getElementById('confirmModal').classList.add('open');
+  });
+}
+function confirmResolve(val) {
+  document.getElementById('confirmModal').classList.remove('open');
+  if (_confirmResolve) { _confirmResolve(val); _confirmResolve = null; }
+}
+
+// ── Sync User Profile ──
+async function syncUserProfile() {
+  const ok = await customConfirm(
+    'Sync User Profile?',
+    'This will connect to your cloud profile and load all your data. Any local-only data will be merged.',
+    'Sync'
+  );
+  if (!ok) return;
+  settings.binId = SYNC_PROFILE_BIN_ID;
+  saveSettingsToStorage();
+  updateSyncStatus();
+  document.getElementById('binIdInput').value = settings.binId;
+  toast('Syncing profile...');
+  await pullFromCloud();
+  toast('Profile synced!');
+}
+
+// ── Notifications ──
+function loadNotificationState() {
+  notificationsEnabled = localStorage.getItem('sr_notifications') === 'true';
+  updateNotifButton();
+}
+function updateNotifButton() {
+  const btn = document.getElementById('notifBtn');
+  btn.style.borderColor = notificationsEnabled ? 'var(--accent)' : '';
+  btn.style.color = notificationsEnabled ? 'var(--accent)' : '';
+}
+async function toggleNotifications() {
+  if (!notificationsEnabled) {
+    if (!('Notification' in window)) { toast('Browser does not support notifications'); return; }
+    const perm = await Notification.requestPermission();
+    if (perm === 'granted') {
+      notificationsEnabled = true;
+      localStorage.setItem('sr_notifications', 'true');
+      updateNotifButton();
+      toast('Notifications enabled!');
+      checkNotifications();
+    } else {
+      toast('Notification permission denied');
+    }
+  } else {
+    notificationsEnabled = false;
+    localStorage.setItem('sr_notifications', 'false');
+    updateNotifButton();
+    toast('Notifications disabled');
+  }
+}
+function checkNotifications() {
+  const overdueCount = topics.filter(t => categorize(t) === 'overdue').length;
+  const todayCount = topics.filter(t => categorize(t) === 'today').length;
+  const dueCount = overdueCount + todayCount;
+  const badge = document.getElementById('notifBadge');
+  badge.classList.toggle('show', dueCount > 0);
+
+  if (notificationsEnabled && dueCount > 0 && Notification.permission === 'granted') {
+    const lastNotif = localStorage.getItem('sr_last_notif');
+    const now = today();
+    if (lastNotif !== now) {
+      new Notification('SR Tracker', {
+        body: `You have ${dueCount} topic${dueCount > 1 ? 's' : ''} to review${overdueCount > 0 ? ` (${overdueCount} overdue!)` : ''}.`,
+        icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">📚</text></svg>'
+      });
+      localStorage.setItem('sr_last_notif', now);
+    }
+  }
+}
+// Periodic check every 30 minutes
+setInterval(() => { if (notificationsEnabled) checkNotifications(); }, 30 * 60 * 1000);
+
 function getSubjectNames() { return subjects.map(s => s.name); }
 function getSubjectColor(name) { const s = subjects.find(x => x.name === name); return s ? s.color : '#64748b'; }
 
@@ -518,27 +733,94 @@ function renderSubjectSelect() {
 // ── Subject modal ──
 function openAddSubject() {
   selectedColor = SUBJECT_COLORS[0];
+  editingSubjectIndex = -1;
   document.getElementById('subjectNameInput').value = '';
   renderColorGrid(); renderSubjectList();
   document.getElementById('addSubjectModal').classList.add('open');
   document.getElementById('subjectNameInput').focus();
 }
-function closeAddSubject() { document.getElementById('addSubjectModal').classList.remove('open'); }
+function closeAddSubject() { document.getElementById('addSubjectModal').classList.remove('open'); editingSubjectIndex = -1; }
 
 function renderSubjectList() {
-  document.getElementById('subjectList').innerHTML = subjects.map((s, i) =>
-    `<div class="subject-item"><span class="color-dot" style="background:${s.color};"></span><span class="subject-name">${escapeHtml(s.name)}</span><button class="btn-del-subject" onclick="deleteSubject(${i})">&times;</button></div>`
-  ).join('');
+  const list = document.getElementById('subjectList');
+  list.innerHTML = subjects.map((s, i) => {
+    if (i === editingSubjectIndex) {
+      return `<div class="subject-edit-form">
+        <div class="subject-edit-top">
+          <input type="text" id="editSubjectName" value="${escapeHtml(s.name)}" placeholder="Subject name">
+        </div>
+        <div class="subject-edit-colors">${SUBJECT_COLORS.map(c =>
+          `<div class="mini-swatch${c === editingSubjectColor ? ' selected' : ''}" style="background:${c};" onclick="pickEditSubjectColor('${c}')"></div>`
+        ).join('')}</div>
+        <div class="subject-edit-actions">
+          <button class="btn-cancel-edit" onclick="cancelEditSubject()">Cancel</button>
+          <button class="btn-save-edit" onclick="saveSubjectEdit(${i})">Save</button>
+        </div>
+      </div>`;
+    }
+    return `<div class="subject-item">
+      <span class="color-dot" style="background:${s.color};"></span>
+      <span class="subject-name">${escapeHtml(s.name)}</span>
+      <button class="btn-edit-subject" onclick="startEditSubject(${i})" title="Edit">&#9998;</button>
+      <button class="btn-del-subject" onclick="deleteSubject(${i})" title="Delete">&times;</button>
+    </div>`;
+  }).join('');
+  // Focus edit input if editing
+  if (editingSubjectIndex >= 0) {
+    const inp = document.getElementById('editSubjectName');
+    if (inp) { inp.focus(); inp.select(); }
+  }
 }
-function deleteSubject(i) {
+
+function startEditSubject(i) {
+  editingSubjectIndex = i;
+  editingSubjectColor = subjects[i].color;
+  renderSubjectList();
+}
+function cancelEditSubject() {
+  editingSubjectIndex = -1;
+  renderSubjectList();
+}
+function pickEditSubjectColor(c) {
+  editingSubjectColor = c;
+  renderSubjectList();
+}
+function saveSubjectEdit(i) {
+  const nameEl = document.getElementById('editSubjectName');
+  const newName = nameEl ? nameEl.value.trim() : '';
+  if (!newName) { toast('Name cannot be empty'); return; }
+  const oldName = subjects[i].name;
+  // Check duplicate (allow same name if unchanged)
+  if (newName.toLowerCase() !== oldName.toLowerCase() && subjects.find(s => s.name.toLowerCase() === newName.toLowerCase())) {
+    toast('Subject name already exists'); return;
+  }
+  pushUndo('edit subject');
+  // Update topics referencing old name
+  if (newName !== oldName) {
+    topics.forEach(t => { if (t.subject === oldName) t.subject = newName; });
+  }
+  subjects[i].name = newName;
+  subjects[i].color = editingSubjectColor;
+  editingSubjectIndex = -1;
+  saveSubjects(); saveTopics();
+  renderSubjectSelect(); renderSubjectList(); renderTabs(); render();
+  toast(`Subject updated`);
+}
+
+async function deleteSubject(i) {
   const subj = subjects[i];
   const n = topics.filter(t => t.subject === subj.name).length;
-  if (n > 0 && !confirm(`"${subj.name}" has ${n} topic(s). Delete?`)) return;
+  const detail = n > 0
+    ? `This subject has ${n} topic${n > 1 ? 's' : ''}. They will keep their current subject label but the subject will be removed from the list.`
+    : 'This subject has no topics.';
+  const ok = await customConfirm(`Delete "${subj.name}"?`, detail);
+  if (!ok) return;
   pushUndo('delete subject');
   subjects.splice(i, 1);
   saveSubjects(); renderSubjectSelect(); renderSubjectList(); renderTabs(); render();
-  toast(`Subject "${subj.name}" deleted`);
+  toastWithUndo(`Subject "${subj.name}" deleted`);
 }
+
 function renderColorGrid() {
   document.getElementById('colorGrid').innerHTML = SUBJECT_COLORS.map(c =>
     `<div class="color-swatch${c === selectedColor ? ' selected' : ''}" style="background:${c};" onclick="pickColor('${c}')"></div>`
@@ -648,7 +930,6 @@ function updateStreak() {
   const allDates = new Set();
   topics.forEach(t => { if (t.history) t.history.forEach(h => allDates.add(h.date)); });
   let streak = 0, d = today();
-  // Check if today has reviews; if not start from yesterday
   if (!allDates.has(d)) d = addDays(d, -1);
   while (allDates.has(d)) { streak++; d = addDays(d, -1); }
   const badge = document.getElementById('streakBadge');
@@ -668,6 +949,13 @@ function formatDate(dateStr) {
   if (diff <= 7) return `In ${diff}d`;
   return new Date(dateStr + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 }
+function getMonday(d) {
+  const dt = new Date(d);
+  const day = dt.getDay();
+  const diff = dt.getDate() - day + (day === 0 ? -6 : 1);
+  dt.setDate(diff);
+  return dt.toISOString().split('T')[0];
+}
 
 // ── Topic operations ──
 function addTopic() {
@@ -677,33 +965,51 @@ function addTopic() {
   pushUndo('add topic');
   topics.push({ id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), name, subject, level: 1, nextReview: addDays(today(), 1), history: [], createdAt: today() });
   input.value = ''; input.focus();
-  saveTopics(); renderTabs(); render(); updateStreak();
+  saveTopics(); renderTabs(); render(); updateStreak(); checkNotifications();
   toastWithUndo(`Added "${name}"`);
 }
+
+function animateCard(id, callback) {
+  const card = document.querySelector(`[data-id="${id}"]`);
+  if (card) {
+    card.classList.add('removing');
+    setTimeout(callback, 280);
+  } else {
+    callback();
+  }
+}
+
 function markSuccess(id) {
   const t = topics.find(x => x.id === id); if (!t) return;
-  pushUndo('pass');
-  t.history.push({ date: today(), result: 'pass', fromLevel: t.level });
-  if (t.level < 7) { t.nextReview = addDays(today(), INTERVALS[t.level]); t.level++; }
-  if (t.level === 7) t.nextReview = null;
-  saveTopics(); renderTabs(); render(); updateStreak();
-  toastWithUndo(`Passed "${t.name}"`);
+  animateCard(id, () => {
+    pushUndo('pass');
+    t.history.push({ date: today(), result: 'pass', fromLevel: t.level });
+    if (t.level < 7) { t.nextReview = addDays(today(), INTERVALS[t.level]); t.level++; }
+    if (t.level === 7) t.nextReview = null;
+    saveTopics(); renderTabs(); render(); updateStreak(); checkNotifications();
+    toastWithUndo(`Passed "${t.name}"`);
+  });
 }
 function markFail(id) {
   const t = topics.find(x => x.id === id); if (!t) return;
-  pushUndo('fail');
-  t.history.push({ date: today(), result: 'fail', fromLevel: t.level });
-  t.level = 1; t.nextReview = addDays(today(), INTERVALS[1]);
-  saveTopics(); renderTabs(); render(); updateStreak();
-  toastWithUndo(`Failed "${t.name}"`);
+  animateCard(id, () => {
+    pushUndo('fail');
+    t.history.push({ date: today(), result: 'fail', fromLevel: t.level });
+    t.level = 1; t.nextReview = addDays(today(), INTERVALS[1]);
+    saveTopics(); renderTabs(); render(); updateStreak(); checkNotifications();
+    toastWithUndo(`Failed "${t.name}"`);
+  });
 }
-function deleteTopic(id) {
+async function deleteTopic(id) {
   const t = topics.find(x => x.id === id); if (!t) return;
-  if (!confirm(`Delete "${t.name}"?`)) return;
-  pushUndo('delete topic');
-  topics = topics.filter(x => x.id !== id);
-  saveTopics(); renderTabs(); render();
-  toastWithUndo(`Deleted "${t.name}"`);
+  const ok = await customConfirm(`Delete "${t.name}"?`, `This will remove the topic from ${t.subject}. You can undo this action.`);
+  if (!ok) return;
+  animateCard(id, () => {
+    pushUndo('delete topic');
+    topics = topics.filter(x => x.id !== id);
+    saveTopics(); renderTabs(); render();
+    toastWithUndo(`Deleted "${t.name}"`);
+  });
 }
 
 function categorize(topic) {
@@ -720,12 +1026,14 @@ function setView(view) {
   currentView = view;
   document.getElementById('viewList').classList.toggle('active', view === 'list');
   document.getElementById('viewCalendar').classList.toggle('active', view === 'calendar');
+  document.getElementById('viewWeek').classList.toggle('active', view === 'week');
   document.getElementById('topicList').style.display = view === 'list' ? '' : 'none';
-  document.getElementById('calendarView').style.display = view === 'calendar' ? '' : 'none';
+  document.getElementById('calendarView').style.display = (view === 'calendar' || view === 'week') ? '' : 'none';
   if (view === 'calendar') renderCalendar();
+  if (view === 'week') renderWeekView();
 }
 
-// ── Calendar ──
+// ── Calendar (Month) ──
 function renderCalendar() {
   const container = document.getElementById('calendarView');
   const year = calendarYear, month = calendarMonth;
@@ -736,7 +1044,6 @@ function renderCalendar() {
 
   const filtered = activeFilter === 'All' ? topics : topics.filter(t => t.subject === activeFilter);
   const dateMap = {};
-  // Include overdue topics on today
   const todayStr = today();
   filtered.forEach(t => {
     if (t.level === 7 || !t.nextReview) return;
@@ -751,7 +1058,7 @@ function renderCalendar() {
     <button onclick="calendarNext()">&rarr;</button>
   </div><div class="calendar-grid">`;
 
-  ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].forEach(d => { html += `<div class="calendar-day-header">${d}</div>`; });
+  ['S','M','T','W','T','F','S'].forEach(d => { html += `<div class="calendar-day-header">${d}</div>`; });
 
   const prevDays = new Date(year, month, 0).getDate();
   for (let i = startDow - 1; i >= 0; i--) html += `<div class="calendar-day other-month"><span class="day-num">${prevDays - i}</span></div>`;
@@ -762,9 +1069,9 @@ function renderCalendar() {
     const isSelected = dateStr === selectedCalendarDay;
     const dayTopics = dateMap[dateStr] || [];
     let dotsHtml = '';
-    if (dayTopics.length > 0 && dayTopics.length <= 4) {
+    if (dayTopics.length > 0 && dayTopics.length <= 3) {
       dotsHtml = '<div class="day-dots">' + dayTopics.map(t => `<span class="day-dot" style="background:${getSubjectColor(t.subject)};"></span>`).join('') + '</div>';
-    } else if (dayTopics.length > 4) {
+    } else if (dayTopics.length > 3) {
       dotsHtml = `<span class="day-count">${dayTopics.length}</span>`;
     }
     const cls = `calendar-day${isToday ? ' today-cell' : ''}${isSelected ? ' selected-day' : ''}`;
@@ -776,7 +1083,76 @@ function renderCalendar() {
 
   html += '</div>';
 
-  // Day detail panel
+  if (selectedCalendarDay && dateMap[selectedCalendarDay] && dateMap[selectedCalendarDay].length > 0) {
+    const dayTopics = dateMap[selectedCalendarDay];
+    html += `<div class="calendar-day-detail"><div class="detail-title">${formatDate(selectedCalendarDay)} - ${dayTopics.length} topic(s)</div>`;
+    dayTopics.forEach(t => {
+      html += `<div class="detail-item"><span class="topic-subject" style="background:${getSubjectColor(t.subject)};">${escapeHtml(t.subject)}</span> ${escapeHtml(t.name)} <span style="color:var(--text-dim);font-size:0.7rem;">Lv${t.level}/7</span></div>`;
+    });
+    html += '</div>';
+  }
+
+  html += '</div>';
+  container.innerHTML = html;
+}
+
+// ── Calendar (Week) ──
+function renderWeekView() {
+  const container = document.getElementById('calendarView');
+  const filtered = activeFilter === 'All' ? topics : topics.filter(t => t.subject === activeFilter);
+  const dateMap = {};
+  const todayStr = today();
+  filtered.forEach(t => {
+    if (t.level === 7 || !t.nextReview) return;
+    const d = daysDiff(t.nextReview) < 0 ? todayStr : t.nextReview;
+    if (!dateMap[d]) dateMap[d] = [];
+    dateMap[d].push(t);
+  });
+
+  const weekStart = calendarWeekStart;
+  const weekDays = [];
+  for (let i = 0; i < 7; i++) weekDays.push(addDays(weekStart, i));
+
+  const startDate = new Date(weekStart + 'T00:00:00');
+  const endDate = new Date(addDays(weekStart, 6) + 'T00:00:00');
+  const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const rangeLabel = startDate.getMonth() === endDate.getMonth()
+    ? `${startDate.getDate()} - ${endDate.getDate()} ${monthNames[startDate.getMonth()]} ${startDate.getFullYear()}`
+    : `${startDate.getDate()} ${monthNames[startDate.getMonth()]} - ${endDate.getDate()} ${monthNames[endDate.getMonth()]} ${endDate.getFullYear()}`;
+
+  let html = `<div class="calendar-container"><div class="calendar-nav">
+    <button onclick="weekPrev()">&larr;</button>
+    <span class="month-label">${rangeLabel}</span>
+    <button onclick="weekNext()">&rarr;</button>
+  </div>`;
+
+  // Day headers
+  const dayNames = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  html += '<div class="week-grid">';
+  dayNames.forEach(d => { html += `<div class="calendar-day-header">${d}</div>`; });
+
+  // Day cells
+  weekDays.forEach(dateStr => {
+    const isToday = dateStr === todayStr;
+    const isSelected = dateStr === selectedCalendarDay;
+    const dayTopics = dateMap[dateStr] || [];
+    const d = new Date(dateStr + 'T00:00:00').getDate();
+    let cls = `week-day-cell${isToday ? ' today-cell' : ''}${isSelected ? ' selected-day' : ''}`;
+    let topicsHtml = '';
+    const maxShow = 4;
+    dayTopics.slice(0, maxShow).forEach(t => {
+      topicsHtml += `<div class="wk-topic" style="background:${getSubjectColor(t.subject)};">${escapeHtml(t.name)}</div>`;
+    });
+    if (dayTopics.length > maxShow) {
+      topicsHtml += `<div style="font-size:0.6rem;color:var(--text-dim);">+${dayTopics.length - maxShow} more</div>`;
+    }
+    html += `<div class="${cls}" onclick="selectCalendarDay('${dateStr}');renderWeekView();">
+      <div class="wk-date">${d}</div>${topicsHtml}
+    </div>`;
+  });
+  html += '</div>';
+
+  // Detail panel
   if (selectedCalendarDay && dateMap[selectedCalendarDay] && dateMap[selectedCalendarDay].length > 0) {
     const dayTopics = dateMap[selectedCalendarDay];
     html += `<div class="calendar-day-detail"><div class="detail-title">${formatDate(selectedCalendarDay)} - ${dayTopics.length} topic(s)</div>`;
@@ -792,10 +1168,12 @@ function renderCalendar() {
 
 function selectCalendarDay(dateStr) {
   selectedCalendarDay = selectedCalendarDay === dateStr ? null : dateStr;
-  renderCalendar();
+  if (currentView === 'calendar') renderCalendar();
 }
 function calendarPrev() { calendarMonth--; if (calendarMonth < 0) { calendarMonth = 11; calendarYear--; } selectedCalendarDay = null; renderCalendar(); }
 function calendarNext() { calendarMonth++; if (calendarMonth > 11) { calendarMonth = 0; calendarYear++; } selectedCalendarDay = null; renderCalendar(); }
+function weekPrev() { calendarWeekStart = addDays(calendarWeekStart, -7); selectedCalendarDay = null; renderWeekView(); }
+function weekNext() { calendarWeekStart = addDays(calendarWeekStart, 7); selectedCalendarDay = null; renderWeekView(); }
 
 // ── Render ──
 function renderTabs() {
@@ -823,7 +1201,14 @@ function renderSubjectStats() {
     const count = topics.filter(t => t.subject === s.name).length;
     const overdue = topics.filter(t => t.subject === s.name && categorize(t) === 'overdue').length;
     const mastered = topics.filter(t => t.subject === s.name && t.level === 7).length;
-    return `<div class="subject-stat"><span class="ss-dot" style="background:${s.color};"></span>${escapeHtml(s.name)}: <span class="ss-count">${count}</span>${overdue > 0 ? `<span style="color:var(--overdue);">(${overdue}!)</span>` : ''}${mastered > 0 ? `<span style="color:var(--mastered);">(${mastered}&#10003;)</span>` : ''}</div>`;
+    const pct = count > 0 ? Math.round((mastered / count) * 100) : 0;
+    return `<div class="subject-stat">
+      <span class="ss-dot" style="background:${s.color};"></span>
+      ${escapeHtml(s.name)}: <span class="ss-count">${count}</span>
+      ${overdue > 0 ? `<span style="color:var(--overdue);">(${overdue}!)</span>` : ''}
+      <div class="ss-progress"><div class="ss-progress-fill" style="width:${pct}%;background:${s.color};"></div></div>
+      <span style="font-size:0.6rem;color:var(--mastered);">${pct}%</span>
+    </div>`;
   }).join('');
 }
 
@@ -854,25 +1239,29 @@ function render() {
   if (filtered.length === 0) {
     container.innerHTML = `<div class="empty-state"><div class="icon">&#128218;</div><p>${searchQuery ? 'No matching topics' : 'No topics yet. Add one above!'}</p></div>`;
     if (currentView === 'calendar') renderCalendar();
+    if (currentView === 'week') renderWeekView();
     return;
   }
   let html = '';
+  let cardIndex = 0;
   [{ key: 'overdue', label: 'Overdue', cls: 'overdue' }, { key: 'today', label: 'Due Today', cls: 'today' }, { key: 'soon', label: 'Coming Soon', cls: 'soon' }, { key: 'later', label: 'Later', cls: 'later' }, { key: 'mastered', label: 'Mastered', cls: 'mastered' }].forEach(sec => {
     if (groups[sec.key].length === 0) return;
     html += `<div class="section-header ${sec.cls}"><span class="dot"></span>${sec.label} (${groups[sec.key].length})</div>`;
-    groups[sec.key].forEach(t => { html += renderCard(t, sec.key); });
+    groups[sec.key].forEach(t => { html += renderCard(t, sec.key, cardIndex++); });
   });
   container.innerHTML = html;
   if (currentView === 'calendar') renderCalendar();
+  if (currentView === 'week') renderWeekView();
 }
 
-function renderCard(t, category) {
+function renderCard(t, category, index) {
   const subjColor = getSubjectColor(t.subject);
   const cardClass = { overdue: 'overdue', today: 'due-today', soon: 'due-soon', mastered: 'mastered-card' }[category] || '';
   const pips = Array.from({ length: 7 }, (_, i) => `<span class="${t.level === 7 ? 'pip mastered-pip' : (i < t.level ? 'pip filled' : 'pip')}"></span>`).join('');
   const dateStr = t.level === 7 ? 'Mastered' : formatDate(t.nextReview);
   const sessions = t.history ? t.history.length : 0;
-  return `<div class="topic-card ${cardClass}">
+  const delay = Math.min(index * 30, 300);
+  return `<div class="topic-card ${cardClass}" data-id="${t.id}" style="animation-delay:${delay}ms;">
     <div class="topic-info">
       <div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;">
         <span class="topic-subject" style="background:${subjColor};">${escapeHtml(t.subject)}</span>
@@ -951,6 +1340,7 @@ document.getElementById('searchInput').addEventListener('input', e => { searchQu
 document.getElementById('settingsModal').addEventListener('click', function(e) { if (e.target === this) closeSettings(); });
 document.getElementById('addSubjectModal').addEventListener('click', function(e) { if (e.target === this) closeAddSubject(); });
 document.getElementById('editTopicModal').addEventListener('click', function(e) { if (e.target === this) closeEditTopic(); });
+document.getElementById('confirmModal').addEventListener('click', function(e) { if (e.target === this) confirmResolve(false); });
 document.getElementById('subjectNameInput').addEventListener('keydown', e => { if (e.key === 'Enter') confirmAddSubject(); });
 document.getElementById('editTopicName').addEventListener('keydown', e => { if (e.key === 'Enter') saveEditTopic(); });
 
