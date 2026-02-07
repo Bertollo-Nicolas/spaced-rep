@@ -278,15 +278,7 @@ body {
 .color-swatch { width: 28px; height: 28px; border-radius: 6px; border: 2px solid transparent; cursor: pointer; transition: all 0.15s; }
 .color-swatch:hover { transform: scale(1.15); }
 .color-swatch.selected { border-color: #fff; box-shadow: 0 0 0 2px var(--accent); }
-.subject-list { margin-top: 0.8rem; display: flex; flex-direction: column; gap: 0.4rem; max-height: 260px; overflow-y: auto; }
-.subject-item { display: flex; align-items: center; gap: 0.5rem; padding: 0.4rem 0.6rem; background: var(--bg-input); border-radius: 6px; font-size: 0.85rem; transition: background 0.15s; }
-.subject-item:hover { background: var(--bg-hover); }
-.subject-item .color-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
-.subject-item .subject-name { flex: 1; }
-.subject-item .btn-edit-subject { background: var(--bg-hover); border: 1px solid var(--border); color: var(--accent); cursor: pointer; font-size: 0.75rem; padding: 0.2rem 0.5rem; border-radius: 4px; transition: all 0.15s; font-weight: 600; }
-.subject-item .btn-edit-subject:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
-.subject-item .btn-del-subject { background: var(--bg-hover); border: 1px solid var(--border); color: var(--fail); cursor: pointer; font-size: 0.85rem; padding: 0.2rem 0.5rem; border-radius: 4px; transition: all 0.15s; font-weight: 600; }
-.subject-item .btn-del-subject:hover { background: var(--fail); color: #fff; border-color: var(--fail); }
+.subject-list { margin-top: 0.8rem; display: flex; flex-direction: column; gap: 0.5rem; max-height: 280px; overflow-y: auto; }
 
 /* Subject edit inline */
 .subject-edit-form { display: flex; flex-direction: column; gap: 0.4rem; padding: 0.5rem 0.6rem; background: var(--bg-hover); border-radius: 6px; border: 1px solid var(--accent); animation: cardEnter 0.2s ease-out; }
@@ -743,9 +735,11 @@ function closeAddSubject() { document.getElementById('addSubjectModal').classLis
 
 function renderSubjectList() {
   const list = document.getElementById('subjectList');
-  list.innerHTML = subjects.map((s, i) => {
+  let html = '';
+  for (let i = 0; i < subjects.length; i++) {
+    const s = subjects[i];
     if (i === editingSubjectIndex) {
-      return `<div class="subject-edit-form">
+      html += `<div class="subject-edit-form">
         <div class="subject-edit-top">
           <input type="text" id="editSubjectName" value="${escapeHtml(s.name)}" placeholder="Subject name">
         </div>
@@ -757,15 +751,19 @@ function renderSubjectList() {
           <button class="btn-save-edit" onclick="saveSubjectEdit(${i})">Save</button>
         </div>
       </div>`;
+    } else {
+      html += '<div style="display:flex;align-items:center;gap:0.5rem;padding:0.5rem 0.6rem;background:var(--bg-input);border-radius:6px;font-size:0.85rem;">'
+        + '<span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:' + s.color + ';flex-shrink:0;"></span>'
+        + '<span style="flex:1;font-weight:500;">' + escapeHtml(s.name) + '</span>'
+        + '<button onclick="startEditSubject(' + i + ')" style="background:#6c63ff;color:#fff;border:none;border-radius:4px;padding:4px 10px;font-size:12px;font-weight:700;cursor:pointer;">Edit</button>'
+        + '<button onclick="deleteSubject(' + i + ')" style="background:#ef4444;color:#fff;border:none;border-radius:4px;padding:4px 10px;font-size:12px;font-weight:700;cursor:pointer;">Delete</button>'
+        + '</div>';
     }
-    return `<div class="subject-item">
-      <span class="color-dot" style="background:${s.color};"></span>
-      <span class="subject-name">${escapeHtml(s.name)}</span>
-      <button class="btn-edit-subject" onclick="startEditSubject(${i})" title="Edit">Edit</button>
-      <button class="btn-del-subject" onclick="deleteSubject(${i})" title="Delete">Delete</button>
-    </div>`;
-  }).join('');
-  // Focus edit input if editing
+  }
+  if (subjects.length === 0) {
+    html = '<div style="padding:1rem;text-align:center;color:var(--text-dim);">No subjects yet</div>';
+  }
+  list.innerHTML = html;
   if (editingSubjectIndex >= 0) {
     const inp = document.getElementById('editSubjectName');
     if (inp) { inp.focus(); inp.select(); }
