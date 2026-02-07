@@ -31,6 +31,17 @@
   --shadow: 0 2px 8px rgba(0,0,0,0.3);
 }
 
+[data-theme="light"] {
+  --bg: #f5f5f7;
+  --bg-card: #ffffff;
+  --bg-hover: #f0f0f2;
+  --bg-input: #f8f8fa;
+  --border: #d4d4d8;
+  --text: #1a1a2e;
+  --text-dim: #6b7280;
+  --shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
 html { font-size: 15px; }
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -38,6 +49,7 @@ body {
   color: var(--text);
   min-height: 100vh;
   line-height: 1.5;
+  transition: background 0.2s, color 0.2s;
 }
 
 /* Header */
@@ -52,139 +64,92 @@ body {
   top: 0;
   z-index: 100;
 }
-.header h1 {
-  font-size: 1.15rem;
-  font-weight: 700;
-  color: var(--accent);
-  letter-spacing: -0.02em;
-}
-.header-actions { display: flex; gap: 0.5rem; }
+.header h1 { font-size: 1.15rem; font-weight: 700; color: var(--accent); letter-spacing: -0.02em; }
+.header-right { display: flex; align-items: center; gap: 0.7rem; }
+.header-actions { display: flex; gap: 0.4rem; }
 .icon-btn {
   background: transparent;
   border: 1px solid var(--border);
   color: var(--text-dim);
-  width: 36px;
-  height: 36px;
+  width: 34px; height: 34px;
   border-radius: var(--radius);
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.1rem;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem;
   transition: all 0.15s;
 }
 .icon-btn:hover { background: var(--bg-hover); color: var(--text); border-color: var(--accent); }
 
-/* Main container */
 .container { max-width: 800px; margin: 0 auto; padding: 1rem; }
 
-/* View toggle */
-.view-toggle {
-  display: flex;
-  gap: 0.4rem;
-  margin-bottom: 1rem;
+/* Streak badge */
+.streak-badge {
+  font-size: 0.7rem;
+  color: var(--warn);
+  font-weight: 600;
+  display: flex; align-items: center; gap: 0.2rem;
 }
+
+/* View toggle */
+.view-toggle { display: flex; gap: 0.4rem; margin-bottom: 1rem; }
 .view-btn {
-  padding: 0.4rem 0.8rem;
-  border-radius: var(--radius);
-  border: 1px solid var(--border);
-  background: var(--bg-card);
-  color: var(--text-dim);
-  cursor: pointer;
-  font-size: 0.8rem;
-  font-weight: 500;
-  transition: all 0.15s;
+  padding: 0.4rem 0.8rem; border-radius: var(--radius);
+  border: 1px solid var(--border); background: var(--bg-card);
+  color: var(--text-dim); cursor: pointer; font-size: 0.8rem; font-weight: 500; transition: all 0.15s;
 }
 .view-btn:hover { border-color: var(--accent); color: var(--text); }
 .view-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
 
 /* Stats row */
-.stats-row {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 0.6rem;
-  margin-bottom: 1rem;
-}
-.stat-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 0.7rem;
-  text-align: center;
-}
-.stat-num {
-  font-size: 1.5rem;
-  font-weight: 700;
-  line-height: 1.2;
-}
-.stat-label {
-  font-size: 0.7rem;
-  color: var(--text-dim);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
+.stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.6rem; margin-bottom: 1rem; }
+.stat-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 0.7rem; text-align: center; }
+.stat-num { font-size: 1.5rem; font-weight: 700; line-height: 1.2; }
+.stat-label { font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.05em; }
 .stat-overdue .stat-num { color: var(--overdue); }
 .stat-today .stat-num { color: var(--due-today); }
 .stat-soon .stat-num { color: var(--due-soon); }
 .stat-mastered .stat-num { color: var(--mastered); }
 
-/* Tabs */
-.tabs {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.4rem;
-  margin-bottom: 1rem;
+/* Subject stats bar */
+.subject-stats { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 1rem; }
+.subject-stat {
+  display: flex; align-items: center; gap: 0.3rem;
+  padding: 0.25rem 0.6rem; border-radius: 6px;
+  background: var(--bg-card); border: 1px solid var(--border);
+  font-size: 0.7rem; color: var(--text-dim);
 }
+.subject-stat .ss-dot { width: 6px; height: 6px; border-radius: 50%; }
+.subject-stat .ss-count { font-weight: 600; color: var(--text); }
+
+/* Tabs */
+.tabs { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 1rem; }
 .tab {
-  padding: 0.45rem 0.8rem;
-  border-radius: var(--radius);
-  border: 1px solid var(--border);
-  background: var(--bg-card);
-  color: var(--text-dim);
-  cursor: pointer;
-  font-size: 0.8rem;
-  font-weight: 500;
-  white-space: nowrap;
-  transition: all 0.15s;
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
+  padding: 0.45rem 0.8rem; border-radius: var(--radius);
+  border: 1px solid var(--border); background: var(--bg-card);
+  color: var(--text-dim); cursor: pointer; font-size: 0.8rem; font-weight: 500;
+  white-space: nowrap; transition: all 0.15s; display: flex; align-items: center; gap: 0.4rem;
 }
 .tab:hover { border-color: var(--accent); color: var(--text); }
 .tab.active { color: #fff; }
-.tab .color-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-.tab .count {
-  display: inline-block;
-  background: rgba(255,255,255,0.15);
-  padding: 0 0.4rem;
-  border-radius: 8px;
-  font-size: 0.7rem;
-}
+.tab .color-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.tab .count { display: inline-block; background: rgba(255,255,255,0.15); padding: 0 0.4rem; border-radius: 8px; font-size: 0.7rem; }
 .tab.active .count { background: rgba(255,255,255,0.25); }
+
+/* Search */
+.search-row { margin-bottom: 1rem; }
+.search-input {
+  width: 100%; background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 0.5rem 0.75rem; color: var(--text);
+  font-size: 0.85rem; outline: none; transition: border-color 0.15s;
+}
+.search-input:focus { border-color: var(--accent); }
 
 /* Section headers */
 .section-header {
-  font-size: 0.8rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--text-dim);
-  margin: 1.2rem 0 0.5rem;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
+  font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em;
+  color: var(--text-dim); margin: 1.2rem 0 0.5rem; display: flex; align-items: center; gap: 0.5rem;
 }
-.section-header .dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
+.section-header .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
 .section-header.overdue .dot { background: var(--overdue); }
 .section-header.today .dot { background: var(--due-today); }
 .section-header.soon .dot { background: var(--due-soon); }
@@ -193,421 +158,115 @@ body {
 
 /* Topic cards */
 .topic-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 0.75rem 0.9rem;
-  margin-bottom: 0.5rem;
-  display: flex;
-  align-items: center;
-  gap: 0.7rem;
-  transition: all 0.15s;
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 0.75rem 0.9rem; margin-bottom: 0.5rem;
+  display: flex; align-items: center; gap: 0.7rem; transition: all 0.15s;
 }
 .topic-card:hover { border-color: #3a3e4a; }
 .topic-card.overdue { border-left: 3px solid var(--overdue); }
 .topic-card.due-today { border-left: 3px solid var(--due-today); }
 .topic-card.due-soon { border-left: 3px solid var(--due-soon); }
 .topic-card.mastered-card { border-left: 3px solid var(--mastered); opacity: 0.8; }
-
 .topic-info { flex: 1; min-width: 0; }
-.topic-name {
-  font-weight: 600;
-  font-size: 0.95rem;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.topic-meta {
-  font-size: 0.75rem;
-  color: var(--text-dim);
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.3rem 0.8rem;
-  margin-top: 0.15rem;
-}
-.topic-subject {
-  display: inline-block;
-  padding: 0.1rem 0.45rem;
-  border-radius: 4px;
-  font-size: 0.7rem;
-  font-weight: 600;
-  color: #fff;
-}
-
-/* Add-subject button */
-.add-subject-row {
-  display: flex;
-  gap: 0.5rem;
-  margin-top: 0.5rem;
-}
-.btn-add-subject {
-  background: transparent;
-  border: 1px dashed var(--border);
-  border-radius: 8px;
-  color: var(--text-dim);
-  padding: 0.4rem 0.75rem;
-  font-size: 0.8rem;
-  cursor: pointer;
-  transition: all 0.15s;
-  white-space: nowrap;
-}
-.btn-add-subject:hover { border-color: var(--accent); color: var(--accent); }
-
-/* Color picker grid */
-.color-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-top: 0.4rem;
-}
-.color-swatch {
-  width: 28px;
-  height: 28px;
-  border-radius: 6px;
-  border: 2px solid transparent;
-  cursor: pointer;
-  transition: all 0.15s;
-}
-.color-swatch:hover { transform: scale(1.15); }
-.color-swatch.selected { border-color: #fff; box-shadow: 0 0 0 2px var(--accent); }
-
-/* Subject list in modal */
-.subject-list {
-  margin-top: 0.8rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-  max-height: 200px;
-  overflow-y: auto;
-}
-.subject-item {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.4rem 0.6rem;
-  background: var(--bg-input);
-  border-radius: 6px;
-  font-size: 0.85rem;
-}
-.subject-item .color-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-.subject-item .subject-name { flex: 1; }
-.subject-item .btn-del-subject {
-  background: transparent;
-  border: none;
-  color: var(--text-dim);
-  cursor: pointer;
-  font-size: 1rem;
-  padding: 0 0.3rem;
-  transition: color 0.15s;
-}
-.subject-item .btn-del-subject:hover { color: var(--fail); }
-
-/* Level pips */
-.level-pips {
-  display: flex;
-  gap: 3px;
-  align-items: center;
-}
-.pip {
-  width: 8px;
-  height: 8px;
-  border-radius: 2px;
-  background: var(--border);
-  transition: background 0.15s;
-}
+.topic-name { font-weight: 600; font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.topic-meta { font-size: 0.75rem; color: var(--text-dim); display: flex; flex-wrap: wrap; gap: 0.3rem 0.8rem; margin-top: 0.15rem; }
+.topic-subject { display: inline-block; padding: 0.1rem 0.45rem; border-radius: 4px; font-size: 0.7rem; font-weight: 600; color: #fff; }
+.level-pips { display: flex; gap: 3px; align-items: center; }
+.pip { width: 8px; height: 8px; border-radius: 2px; background: var(--border); transition: background 0.15s; }
 .pip.filled { background: var(--accent); }
 .pip.mastered-pip { background: var(--mastered); }
 
-/* Action buttons on card */
-.topic-actions {
-  display: flex;
-  gap: 0.35rem;
-  flex-shrink: 0;
-}
-.btn-pass, .btn-fail, .btn-del {
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 0.78rem;
-  font-weight: 600;
-  padding: 0.4rem 0.65rem;
-  transition: all 0.15s;
+/* Action buttons */
+.topic-actions { display: flex; gap: 0.35rem; flex-shrink: 0; }
+.btn-pass, .btn-fail, .btn-del, .btn-edit {
+  border: none; border-radius: 6px; cursor: pointer;
+  font-size: 0.78rem; font-weight: 600; padding: 0.4rem 0.65rem; transition: all 0.15s;
 }
 .btn-pass { background: var(--success-dim); color: var(--success); }
 .btn-pass:hover { background: var(--success); color: #fff; }
 .btn-fail { background: var(--fail-dim); color: var(--fail); }
 .btn-fail:hover { background: var(--fail); color: #fff; }
-.btn-del {
-  background: transparent;
-  color: var(--text-dim);
-  padding: 0.4rem;
-  font-size: 0.9rem;
-}
+.btn-edit { background: transparent; color: var(--text-dim); padding: 0.4rem; font-size: 0.85rem; }
+.btn-edit:hover { color: var(--accent); }
+.btn-del { background: transparent; color: var(--text-dim); padding: 0.4rem; font-size: 0.9rem; }
 .btn-del:hover { color: var(--fail); }
 
 /* Add topic area */
-.add-section {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 0.9rem;
-  margin-bottom: 1rem;
-}
-.add-row {
-  display: flex;
-  gap: 0.5rem;
-}
-.add-input {
-  flex: 1;
-  background: var(--bg-input);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 0.55rem 0.75rem;
-  color: var(--text);
-  font-size: 0.9rem;
-  outline: none;
-  transition: border-color 0.15s;
-}
+.add-section { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 0.9rem; margin-bottom: 1rem; }
+.add-row { display: flex; gap: 0.5rem; }
+.add-input { flex: 1; background: var(--bg-input); border: 1px solid var(--border); border-radius: 8px; padding: 0.55rem 0.75rem; color: var(--text); font-size: 0.9rem; outline: none; transition: border-color 0.15s; }
 .add-input:focus { border-color: var(--accent); }
-.add-select {
-  background: var(--bg-input);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 0.55rem 0.75rem;
-  color: var(--text);
-  font-size: 0.85rem;
-  outline: none;
-  cursor: pointer;
-  min-width: 120px;
-}
+.add-select { background: var(--bg-input); border: 1px solid var(--border); border-radius: 8px; padding: 0.55rem 0.75rem; color: var(--text); font-size: 0.85rem; outline: none; cursor: pointer; min-width: 120px; }
 .add-select:focus { border-color: var(--accent); }
-.btn-add {
-  background: var(--accent);
-  border: none;
-  border-radius: 8px;
-  color: #fff;
-  padding: 0.55rem 1rem;
-  font-weight: 600;
-  font-size: 0.9rem;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: background 0.15s;
-}
+.btn-add { background: var(--accent); border: none; border-radius: 8px; color: #fff; padding: 0.55rem 1rem; font-weight: 600; font-size: 0.9rem; cursor: pointer; white-space: nowrap; transition: background 0.15s; }
 .btn-add:hover { background: var(--accent-hover); }
+.add-subject-row { display: flex; gap: 0.5rem; margin-top: 0.5rem; }
+.btn-add-subject { background: transparent; border: 1px dashed var(--border); border-radius: 8px; color: var(--text-dim); padding: 0.4rem 0.75rem; font-size: 0.8rem; cursor: pointer; transition: all 0.15s; white-space: nowrap; }
+.btn-add-subject:hover { border-color: var(--accent); color: var(--accent); }
 
-/* Empty state */
-.empty-state {
-  text-align: center;
-  padding: 3rem 1rem;
-  color: var(--text-dim);
-}
+.empty-state { text-align: center; padding: 3rem 1rem; color: var(--text-dim); }
 .empty-state .icon { font-size: 2.5rem; margin-bottom: 0.5rem; }
-.empty-state p { font-size: 0.9rem; }
 
-/* Modal overlay */
-.modal-overlay {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.6);
-  z-index: 200;
-  align-items: center;
-  justify-content: center;
-  padding: 1rem;
-}
+/* Modal */
+.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 200; align-items: center; justify-content: center; padding: 1rem; }
 .modal-overlay.open { display: flex; }
-.modal {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 1.5rem;
-  width: 100%;
-  max-width: 420px;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
-}
-.modal h2 {
-  font-size: 1.1rem;
-  margin-bottom: 1rem;
-}
-.modal label {
-  display: block;
-  font-size: 0.8rem;
-  color: var(--text-dim);
-  margin-bottom: 0.3rem;
-  margin-top: 0.8rem;
-}
-.modal input[type="text"] {
-  width: 100%;
-  background: var(--bg-input);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 0.55rem 0.75rem;
-  color: var(--text);
-  font-size: 0.9rem;
-  outline: none;
-}
-.modal input[type="text"]:focus { border-color: var(--accent); }
-.modal-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 0.5rem;
-  margin-top: 1.2rem;
-}
-.btn-secondary {
-  background: var(--bg-hover);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  color: var(--text);
-  padding: 0.5rem 1rem;
-  font-size: 0.85rem;
-  cursor: pointer;
-  transition: all 0.15s;
-}
+.modal { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; width: 100%; max-width: 420px; box-shadow: 0 8px 32px rgba(0,0,0,0.5); }
+.modal h2 { font-size: 1.1rem; margin-bottom: 1rem; }
+.modal label { display: block; font-size: 0.8rem; color: var(--text-dim); margin-bottom: 0.3rem; margin-top: 0.8rem; }
+.modal input[type="text"], .modal select { width: 100%; background: var(--bg-input); border: 1px solid var(--border); border-radius: 8px; padding: 0.55rem 0.75rem; color: var(--text); font-size: 0.9rem; outline: none; }
+.modal input[type="text"]:focus, .modal select:focus { border-color: var(--accent); }
+.modal-actions { display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 1.2rem; }
+.btn-secondary { background: var(--bg-hover); border: 1px solid var(--border); border-radius: 8px; color: var(--text); padding: 0.5rem 1rem; font-size: 0.85rem; cursor: pointer; transition: all 0.15s; }
 .btn-secondary:hover { border-color: var(--text-dim); }
-.btn-primary {
-  background: var(--accent);
-  border: none;
-  border-radius: 8px;
-  color: #fff;
-  padding: 0.5rem 1rem;
-  font-weight: 600;
-  font-size: 0.85rem;
-  cursor: pointer;
-  transition: background 0.15s;
-}
+.btn-primary { background: var(--accent); border: none; border-radius: 8px; color: #fff; padding: 0.5rem 1rem; font-weight: 600; font-size: 0.85rem; cursor: pointer; transition: background 0.15s; }
 .btn-primary:hover { background: var(--accent-hover); }
 
+/* Color grid & subject list */
+.color-grid { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.4rem; }
+.color-swatch { width: 28px; height: 28px; border-radius: 6px; border: 2px solid transparent; cursor: pointer; transition: all 0.15s; }
+.color-swatch:hover { transform: scale(1.15); }
+.color-swatch.selected { border-color: #fff; box-shadow: 0 0 0 2px var(--accent); }
+.subject-list { margin-top: 0.8rem; display: flex; flex-direction: column; gap: 0.4rem; max-height: 200px; overflow-y: auto; }
+.subject-item { display: flex; align-items: center; gap: 0.5rem; padding: 0.4rem 0.6rem; background: var(--bg-input); border-radius: 6px; font-size: 0.85rem; }
+.subject-item .color-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.subject-item .subject-name { flex: 1; }
+.subject-item .btn-del-subject { background: transparent; border: none; color: var(--text-dim); cursor: pointer; font-size: 1rem; padding: 0 0.3rem; transition: color 0.15s; }
+.subject-item .btn-del-subject:hover { color: var(--fail); }
+
 /* Sync indicator */
-.sync-status {
-  font-size: 0.7rem;
-  color: var(--text-dim);
-  display: flex;
-  align-items: center;
-  gap: 0.3rem;
-}
-.sync-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--text-dim);
-}
+.sync-status { font-size: 0.7rem; color: var(--text-dim); display: flex; align-items: center; gap: 0.3rem; }
+.sync-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--text-dim); }
 .sync-dot.online { background: var(--success); }
 .sync-dot.syncing { background: var(--warn); animation: pulse 1s infinite; }
 @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
 
 /* Toast */
-.toast-container {
-  position: fixed;
-  bottom: 1rem;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 300;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  align-items: center;
-}
-.toast {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 0.6rem 1rem;
-  font-size: 0.85rem;
-  box-shadow: var(--shadow);
-  animation: slideUp 0.25s ease-out;
-  white-space: nowrap;
-}
-@keyframes slideUp {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
+.toast-container { position: fixed; bottom: 1rem; left: 50%; transform: translateX(-50%); z-index: 300; display: flex; flex-direction: column; gap: 0.5rem; align-items: center; }
+.toast { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 0.6rem 1rem; font-size: 0.85rem; box-shadow: var(--shadow); animation: slideUp 0.25s ease-out; white-space: nowrap; display: flex; align-items: center; gap: 0.6rem; }
+.toast .undo-btn { background: var(--accent); color: #fff; border: none; border-radius: 6px; padding: 0.2rem 0.6rem; font-size: 0.75rem; font-weight: 600; cursor: pointer; }
+@keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
 /* Calendar */
-.calendar-container {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 1rem;
-  margin-bottom: 1rem;
-}
-.calendar-nav {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 0.8rem;
-}
-.calendar-nav button {
-  background: transparent;
-  border: 1px solid var(--border);
-  color: var(--text-dim);
-  border-radius: 6px;
-  padding: 0.3rem 0.6rem;
-  cursor: pointer;
-  font-size: 0.85rem;
-  transition: all 0.15s;
-}
+.calendar-container { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem; margin-bottom: 1rem; }
+.calendar-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.8rem; }
+.calendar-nav button { background: transparent; border: 1px solid var(--border); color: var(--text-dim); border-radius: 6px; padding: 0.3rem 0.6rem; cursor: pointer; font-size: 0.85rem; transition: all 0.15s; }
 .calendar-nav button:hover { border-color: var(--accent); color: var(--text); }
-.calendar-nav .month-label {
-  font-weight: 600;
-  font-size: 0.95rem;
-}
-.calendar-grid {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 2px;
-}
-.calendar-day-header {
-  text-align: center;
-  font-size: 0.65rem;
-  color: var(--text-dim);
-  font-weight: 600;
-  text-transform: uppercase;
-  padding: 0.3rem 0;
-}
-.calendar-day {
-  aspect-ratio: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  border-radius: 6px;
-  font-size: 0.75rem;
-  color: var(--text-dim);
-  position: relative;
-  cursor: default;
-  min-height: 36px;
-}
-.calendar-day.other-month { opacity: 0.3; }
+.calendar-nav .month-label { font-weight: 600; font-size: 0.95rem; }
+.calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+.calendar-day-header { text-align: center; font-size: 0.65rem; color: var(--text-dim); font-weight: 600; text-transform: uppercase; padding: 0.3rem 0; }
+.calendar-day { aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 6px; font-size: 0.75rem; color: var(--text-dim); position: relative; cursor: pointer; min-height: 36px; transition: background 0.1s; }
+.calendar-day:hover { background: var(--bg-hover); }
+.calendar-day.other-month { opacity: 0.3; pointer-events: none; }
 .calendar-day.today-cell { border: 1px solid var(--accent); color: var(--text); }
+.calendar-day.selected-day { background: var(--accent); color: #fff; }
 .calendar-day .day-num { font-weight: 500; }
-.calendar-day .day-dots {
-  display: flex;
-  gap: 2px;
-  margin-top: 2px;
-  flex-wrap: wrap;
-  justify-content: center;
-  max-width: 100%;
-}
-.calendar-day .day-dot {
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-.calendar-day .day-count {
-  font-size: 0.55rem;
-  color: var(--text);
-  background: var(--accent);
-  border-radius: 4px;
-  padding: 0 3px;
-  margin-top: 1px;
-  line-height: 1.3;
-}
+.calendar-day .day-dots { display: flex; gap: 2px; margin-top: 2px; flex-wrap: wrap; justify-content: center; max-width: 100%; }
+.calendar-day .day-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
+.calendar-day .day-count { font-size: 0.55rem; background: var(--accent); border-radius: 4px; padding: 0 3px; margin-top: 1px; line-height: 1.3; color: #fff; }
+.calendar-day-detail { background: var(--bg-input); border: 1px solid var(--border); border-radius: var(--radius); padding: 0.6rem 0.8rem; margin-top: 0.5rem; font-size: 0.8rem; }
+.calendar-day-detail .detail-title { font-weight: 600; margin-bottom: 0.3rem; font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase; }
+.calendar-day-detail .detail-item { display: flex; align-items: center; gap: 0.4rem; padding: 0.2rem 0; }
+.calendar-day-detail .detail-item .topic-subject { font-size: 0.6rem; padding: 0.05rem 0.35rem; }
 
 /* Responsive */
 @media (max-width: 500px) {
@@ -624,48 +283,40 @@ body {
 
 <header class="header">
   <h1>SR Tracker</h1>
-  <div style="display:flex;align-items:center;gap:0.7rem;">
+  <div class="header-right">
+    <div class="streak-badge" id="streakBadge" title="Review streak"></div>
     <div class="sync-status" id="syncStatus">
       <span class="sync-dot" id="syncDot"></span>
       <span id="syncLabel">Local</span>
     </div>
     <div class="header-actions">
+      <button class="icon-btn" id="themeToggle" onclick="toggleTheme()" title="Toggle theme" aria-label="Toggle theme">&#9789;</button>
       <button class="icon-btn" onclick="openSettings()" title="Settings" aria-label="Settings">&#9881;</button>
     </div>
   </div>
 </header>
 
 <div class="container">
-  <!-- Stats -->
   <div class="stats-row">
-    <div class="stat-card stat-overdue">
-      <div class="stat-num" id="statOverdue">0</div>
-      <div class="stat-label">Overdue</div>
-    </div>
-    <div class="stat-card stat-today">
-      <div class="stat-num" id="statToday">0</div>
-      <div class="stat-label">Today</div>
-    </div>
-    <div class="stat-card stat-soon">
-      <div class="stat-num" id="statSoon">0</div>
-      <div class="stat-label">Soon</div>
-    </div>
-    <div class="stat-card stat-mastered">
-      <div class="stat-num" id="statMastered">0</div>
-      <div class="stat-label">Mastered</div>
-    </div>
+    <div class="stat-card stat-overdue"><div class="stat-num" id="statOverdue">0</div><div class="stat-label">Overdue</div></div>
+    <div class="stat-card stat-today"><div class="stat-num" id="statToday">0</div><div class="stat-label">Today</div></div>
+    <div class="stat-card stat-soon"><div class="stat-num" id="statSoon">0</div><div class="stat-label">Soon</div></div>
+    <div class="stat-card stat-mastered"><div class="stat-num" id="statMastered">0</div><div class="stat-label">Mastered</div></div>
   </div>
 
-  <!-- View toggle -->
+  <div class="subject-stats" id="subjectStats"></div>
+
   <div class="view-toggle">
     <button class="view-btn active" id="viewList" onclick="setView('list')">List</button>
     <button class="view-btn" id="viewCalendar" onclick="setView('calendar')">Calendar</button>
   </div>
 
-  <!-- Tabs -->
   <div class="tabs" id="tabs"></div>
 
-  <!-- Add topic -->
+  <div class="search-row">
+    <input class="search-input" id="searchInput" type="text" placeholder="Search topics..." aria-label="Search">
+  </div>
+
   <div class="add-section">
     <div class="add-row">
       <input class="add-input" id="topicInput" type="text" placeholder="New topic name..." aria-label="Topic name">
@@ -677,10 +328,7 @@ body {
     </div>
   </div>
 
-  <!-- Calendar view -->
   <div id="calendarView" style="display:none;"></div>
-
-  <!-- Topic list -->
   <div id="topicList"></div>
 </div>
 
@@ -688,31 +336,25 @@ body {
 <div class="modal-overlay" id="settingsModal">
   <div class="modal">
     <h2>Settings</h2>
-    <label for="masterKeyInput">JSONBin.io Master Key (X-Master-Key)</label>
+    <label for="masterKeyInput">JSONBin Master Key</label>
     <input type="text" id="masterKeyInput" placeholder="$2a$10$...">
-    <label for="accessKeyInput">JSONBin.io Access Key (X-Access-Key)</label>
+    <label for="accessKeyInput">JSONBin Access Key</label>
     <input type="text" id="accessKeyInput" placeholder="$2a$10$...">
     <label for="binIdInput">Bin ID (leave empty to create new)</label>
     <input type="text" id="binIdInput" placeholder="e.g. 64a1b2c3d4...">
     <div style="margin-top:0.8rem;">
-      <label style="margin:0;">
-        <input type="checkbox" id="autoSyncCheckbox" checked>
-        <span style="font-size:0.85rem;color:var(--text);">Auto-sync on changes</span>
-      </label>
+      <label style="margin:0;"><input type="checkbox" id="autoSyncCheckbox" checked> <span style="font-size:0.85rem;color:var(--text);">Auto-sync on changes</span></label>
     </div>
     <div class="modal-actions">
-      <button class="btn-secondary" onclick="exportData()">Export JSON</button>
-      <label class="btn-secondary" style="display:inline-flex;align-items:center;cursor:pointer;">
-        Import
-        <input type="file" accept=".json" style="display:none;" onchange="importData(event)">
-      </label>
+      <button class="btn-secondary" onclick="exportData()">Export</button>
+      <label class="btn-secondary" style="display:inline-flex;align-items:center;cursor:pointer;">Import<input type="file" accept=".json" style="display:none;" onchange="importData(event)"></label>
       <button class="btn-secondary" onclick="closeSettings()">Cancel</button>
       <button class="btn-primary" onclick="saveSettings()">Save</button>
     </div>
   </div>
 </div>
 
-<!-- Add Subject Modal -->
+<!-- Manage Subjects Modal -->
 <div class="modal-overlay" id="addSubjectModal">
   <div class="modal">
     <h2>Manage Subjects</h2>
@@ -729,11 +371,25 @@ body {
   </div>
 </div>
 
-<!-- Toast container -->
+<!-- Edit Topic Modal -->
+<div class="modal-overlay" id="editTopicModal">
+  <div class="modal">
+    <h2>Edit Topic</h2>
+    <input type="hidden" id="editTopicId">
+    <label for="editTopicName">Name</label>
+    <input type="text" id="editTopicName">
+    <label for="editTopicSubject">Subject</label>
+    <select id="editTopicSubject"></select>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeEditTopic()">Cancel</button>
+      <button class="btn-primary" onclick="saveEditTopic()">Save</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast-container" id="toastContainer"></div>
 
 <script>
-// ── Constants ──
 const DEFAULT_SUBJECTS = [
   { name: 'CCNA', color: '#2563eb' },
   { name: 'Wargame', color: '#dc2626' },
@@ -747,295 +403,262 @@ const SUBJECT_COLORS = [
 ];
 const INTERVALS = { 1: 1, 2: 3, 3: 7, 4: 14, 5: 30, 6: 60, 7: Infinity };
 
-// ── State ──
 let topics = [];
 let subjects = [...DEFAULT_SUBJECTS];
 let activeFilter = 'All';
+let searchQuery = '';
 let selectedColor = SUBJECT_COLORS[0];
 let currentView = 'list';
 let calendarMonth = new Date().getMonth();
 let calendarYear = new Date().getFullYear();
+let selectedCalendarDay = null;
+let undoStack = [];
 let settings = { masterKey: '$2a$10$6zzHCkKXNKTBhOGsHDRkeugNKF6XB4omyZ9qvOLMi0VpvL0UEb55C', accessKey: '$2a$10$jcULTdejTl/CbGpWn7/AieINUAEhPietikVHMbXMxcc1tMQjBmTbW', binId: '', autoSync: true };
+
+// ── URL hash for binId persistence across browsers ──
+function getBinIdFromHash() {
+  const h = window.location.hash;
+  if (h.startsWith('#bin=')) return h.slice(5);
+  return '';
+}
+function setBinIdInHash(binId) {
+  if (binId) window.location.hash = 'bin=' + binId;
+}
 
 // ── Init ──
 function init() {
+  loadTheme();
   loadSettings();
+  // Check URL hash for binId (cross-browser sync)
+  const hashBin = getBinIdFromHash();
+  if (hashBin && !settings.binId) {
+    settings.binId = hashBin;
+    saveSettingsToStorage();
+  } else if (settings.binId) {
+    setBinIdInHash(settings.binId);
+  }
   loadSubjects();
   loadTopics();
   renderSubjectSelect();
   renderTabs();
   render();
   updateSyncStatus();
+  updateStreak();
+}
+
+// ── Theme ──
+function loadTheme() {
+  const t = localStorage.getItem('sr_theme') || 'dark';
+  document.documentElement.setAttribute('data-theme', t);
+  updateThemeIcon();
+}
+function toggleTheme() {
+  const current = document.documentElement.getAttribute('data-theme') || 'dark';
+  const next = current === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('sr_theme', next);
+  updateThemeIcon();
+}
+function updateThemeIcon() {
+  const t = document.documentElement.getAttribute('data-theme') || 'dark';
+  document.getElementById('themeToggle').innerHTML = t === 'dark' ? '&#9789;' : '&#9728;';
 }
 
 // ── Storage ──
 function loadSettings() {
-  try {
-    const s = localStorage.getItem('sr_settings');
-    if (s) settings = { ...settings, ...JSON.parse(s) };
-  } catch(e) {}
+  try { const s = localStorage.getItem('sr_settings'); if (s) settings = { ...settings, ...JSON.parse(s) }; } catch(e) {}
 }
-
 function saveSettingsToStorage() {
   localStorage.setItem('sr_settings', JSON.stringify(settings));
+  setBinIdInHash(settings.binId);
 }
-
 function loadTopics() {
-  try {
-    const d = localStorage.getItem('sr_topics');
-    if (d) topics = JSON.parse(d);
-  } catch(e) { topics = []; }
-  if (settings.masterKey && settings.binId) {
-    pullFromCloud();
-  }
+  try { const d = localStorage.getItem('sr_topics'); if (d) topics = JSON.parse(d); } catch(e) { topics = []; }
+  if (settings.masterKey && settings.binId) pullFromCloud();
 }
-
 function saveTopics() {
   localStorage.setItem('sr_topics', JSON.stringify(topics));
-  if (settings.masterKey && settings.autoSync) {
-    pushToCloud();
-  }
+  if (settings.masterKey && settings.autoSync) pushToCloud();
 }
-
-// ── Subjects storage ──
 function loadSubjects() {
-  try {
-    const s = localStorage.getItem('sr_subjects');
-    if (s) subjects = JSON.parse(s);
-  } catch(e) { subjects = [...DEFAULT_SUBJECTS]; }
+  try { const s = localStorage.getItem('sr_subjects'); if (s) subjects = JSON.parse(s); } catch(e) { subjects = [...DEFAULT_SUBJECTS]; }
 }
-
 function saveSubjects() {
   localStorage.setItem('sr_subjects', JSON.stringify(subjects));
-  if (settings.masterKey && settings.autoSync) {
-    pushToCloud();
-  }
+  if (settings.masterKey && settings.autoSync) pushToCloud();
 }
 
-function getSubjectNames() {
-  return subjects.map(s => s.name);
+// ── Undo ──
+function pushUndo(label) {
+  undoStack.push({ label, topics: JSON.parse(JSON.stringify(topics)), subjects: JSON.parse(JSON.stringify(subjects)) });
+  if (undoStack.length > 20) undoStack.shift();
+}
+function performUndo() {
+  if (undoStack.length === 0) return;
+  const snap = undoStack.pop();
+  topics = snap.topics;
+  subjects = snap.subjects;
+  saveTopics();
+  saveSubjects();
+  renderSubjectSelect();
+  renderTabs();
+  render();
+  toast('Undone: ' + snap.label);
 }
 
-function getSubjectColor(name) {
-  const s = subjects.find(x => x.name === name);
-  return s ? s.color : '#64748b';
-}
+function getSubjectNames() { return subjects.map(s => s.name); }
+function getSubjectColor(name) { const s = subjects.find(x => x.name === name); return s ? s.color : '#64748b'; }
 
 function renderSubjectSelect() {
   const select = document.getElementById('subjectSelect');
-  select.innerHTML = subjects.map(s =>
-    `<option value="${escapeHtml(s.name)}">${escapeHtml(s.name)}</option>`
-  ).join('');
-  // Keep active filter selection in sync
-  if (activeFilter !== 'All' && subjects.find(s => s.name === activeFilter)) {
-    select.value = activeFilter;
-  }
+  select.innerHTML = subjects.map(s => `<option value="${escapeHtml(s.name)}">${escapeHtml(s.name)}</option>`).join('');
+  if (activeFilter !== 'All' && subjects.find(s => s.name === activeFilter)) select.value = activeFilter;
 }
 
-// ── Add Subject modal ──
+// ── Subject modal ──
 function openAddSubject() {
   selectedColor = SUBJECT_COLORS[0];
   document.getElementById('subjectNameInput').value = '';
-  renderColorGrid();
-  renderSubjectList();
+  renderColorGrid(); renderSubjectList();
   document.getElementById('addSubjectModal').classList.add('open');
   document.getElementById('subjectNameInput').focus();
 }
-
-function closeAddSubject() {
-  document.getElementById('addSubjectModal').classList.remove('open');
-}
+function closeAddSubject() { document.getElementById('addSubjectModal').classList.remove('open'); }
 
 function renderSubjectList() {
-  const container = document.getElementById('subjectList');
-  container.innerHTML = subjects.map((s, i) =>
-    `<div class="subject-item">
-      <span class="color-dot" style="background:${s.color};"></span>
-      <span class="subject-name">${escapeHtml(s.name)}</span>
-      <button class="btn-del-subject" onclick="deleteSubject(${i})" title="Delete subject">&times;</button>
-    </div>`
+  document.getElementById('subjectList').innerHTML = subjects.map((s, i) =>
+    `<div class="subject-item"><span class="color-dot" style="background:${s.color};"></span><span class="subject-name">${escapeHtml(s.name)}</span><button class="btn-del-subject" onclick="deleteSubject(${i})">&times;</button></div>`
   ).join('');
 }
-
-function deleteSubject(index) {
-  const subj = subjects[index];
-  const usedCount = topics.filter(t => t.subject === subj.name).length;
-  if (usedCount > 0) {
-    if (!confirm(`"${subj.name}" is used by ${usedCount} topic(s). Delete anyway? Topics will keep their subject label.`)) return;
-  }
-  subjects.splice(index, 1);
-  saveSubjects();
-  renderSubjectSelect();
-  renderSubjectList();
-  renderTabs();
-  render();
+function deleteSubject(i) {
+  const subj = subjects[i];
+  const n = topics.filter(t => t.subject === subj.name).length;
+  if (n > 0 && !confirm(`"${subj.name}" has ${n} topic(s). Delete?`)) return;
+  pushUndo('delete subject');
+  subjects.splice(i, 1);
+  saveSubjects(); renderSubjectSelect(); renderSubjectList(); renderTabs(); render();
   toast(`Subject "${subj.name}" deleted`);
 }
-
 function renderColorGrid() {
-  const grid = document.getElementById('colorGrid');
-  grid.innerHTML = SUBJECT_COLORS.map(c =>
-    `<div class="color-swatch${c === selectedColor ? ' selected' : ''}"
-          style="background:${c};"
-          onclick="pickColor('${c}')"></div>`
+  document.getElementById('colorGrid').innerHTML = SUBJECT_COLORS.map(c =>
+    `<div class="color-swatch${c === selectedColor ? ' selected' : ''}" style="background:${c};" onclick="pickColor('${c}')"></div>`
   ).join('');
 }
-
-function pickColor(c) {
-  selectedColor = c;
-  renderColorGrid();
-}
-
+function pickColor(c) { selectedColor = c; renderColorGrid(); }
 function confirmAddSubject() {
   const name = document.getElementById('subjectNameInput').value.trim();
-  if (!name) {
-    document.getElementById('subjectNameInput').focus();
-    return;
-  }
-  if (subjects.find(s => s.name.toLowerCase() === name.toLowerCase())) {
-    toast('Subject already exists');
-    return;
-  }
+  if (!name) { document.getElementById('subjectNameInput').focus(); return; }
+  if (subjects.find(s => s.name.toLowerCase() === name.toLowerCase())) { toast('Already exists'); return; }
+  pushUndo('add subject');
   subjects.push({ name, color: selectedColor });
-  saveSubjects();
-  renderSubjectSelect();
-  renderSubjectList();
-  renderTabs();
-  render();
+  saveSubjects(); renderSubjectSelect(); renderSubjectList(); renderTabs(); render();
   document.getElementById('subjectSelect').value = name;
   document.getElementById('subjectNameInput').value = '';
   toast(`Subject "${name}" added`);
 }
 
+// ── Edit Topic ──
+function openEditTopic(id) {
+  const t = topics.find(x => x.id === id);
+  if (!t) return;
+  document.getElementById('editTopicId').value = id;
+  document.getElementById('editTopicName').value = t.name;
+  const sel = document.getElementById('editTopicSubject');
+  sel.innerHTML = subjects.map(s => `<option value="${escapeHtml(s.name)}">${escapeHtml(s.name)}</option>`).join('');
+  sel.value = t.subject;
+  document.getElementById('editTopicModal').classList.add('open');
+  document.getElementById('editTopicName').focus();
+}
+function closeEditTopic() { document.getElementById('editTopicModal').classList.remove('open'); }
+function saveEditTopic() {
+  const id = document.getElementById('editTopicId').value;
+  const t = topics.find(x => x.id === id);
+  if (!t) return;
+  pushUndo('edit topic');
+  t.name = document.getElementById('editTopicName').value.trim() || t.name;
+  t.subject = document.getElementById('editTopicSubject').value;
+  saveTopics(); renderTabs(); render(); closeEditTopic();
+  toast('Topic updated');
+}
+
 // ── JSONBin API ──
 async function pushToCloud() {
   if (!settings.masterKey) return;
-  const dot = document.getElementById('syncDot');
-  const label = document.getElementById('syncLabel');
-  dot.className = 'sync-dot syncing';
-  label.textContent = 'Syncing...';
-
+  const dot = document.getElementById('syncDot'), label = document.getElementById('syncLabel');
+  dot.className = 'sync-dot syncing'; label.textContent = 'Syncing...';
   const payload = { topics, subjects, updatedAt: new Date().toISOString() };
-  const authHeaders = { 'X-Master-Key': settings.masterKey };
-  if (settings.accessKey) authHeaders['X-Access-Key'] = settings.accessKey;
-
+  const h = { 'X-Master-Key': settings.masterKey };
+  if (settings.accessKey) h['X-Access-Key'] = settings.accessKey;
   try {
     let res;
     if (!settings.binId) {
-      res = await fetch('https://api.jsonbin.io/v3/b', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...authHeaders,
-          'X-Bin-Name': 'sr-tracker'
-        },
-        body: JSON.stringify(payload)
-      });
+      res = await fetch('https://api.jsonbin.io/v3/b', { method: 'POST', headers: { 'Content-Type': 'application/json', ...h, 'X-Bin-Name': 'sr-tracker' }, body: JSON.stringify(payload) });
     } else {
-      res = await fetch(`https://api.jsonbin.io/v3/b/${settings.binId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          ...authHeaders
-        },
-        body: JSON.stringify(payload)
-      });
+      res = await fetch(`https://api.jsonbin.io/v3/b/${settings.binId}`, { method: 'PUT', headers: { 'Content-Type': 'application/json', ...h }, body: JSON.stringify(payload) });
     }
-
     const data = await res.json();
-
-    if (!res.ok) {
-      throw new Error(data.message || `HTTP ${res.status}`);
-    }
-
+    if (!res.ok) throw new Error(data.message || `HTTP ${res.status}`);
     if (!settings.binId && data.metadata) {
       settings.binId = data.metadata.id;
       saveSettingsToStorage();
       document.getElementById('binIdInput').value = settings.binId;
     }
-
-    dot.className = 'sync-dot online';
-    label.textContent = 'Synced';
+    dot.className = 'sync-dot online'; label.textContent = 'Synced';
   } catch(e) {
-    dot.className = 'sync-dot';
-    label.textContent = 'Sync error';
-    console.error('Push failed:', e);
-    toast('Sync failed: ' + e.message);
+    dot.className = 'sync-dot'; label.textContent = 'Sync error';
+    console.error('Push failed:', e); toast('Sync failed: ' + e.message);
   }
 }
 
 async function pullFromCloud() {
   if (!settings.masterKey || !settings.binId) return;
-  const authHeaders = { 'X-Master-Key': settings.masterKey };
-  if (settings.accessKey) authHeaders['X-Access-Key'] = settings.accessKey;
+  const h = { 'X-Master-Key': settings.masterKey };
+  if (settings.accessKey) h['X-Access-Key'] = settings.accessKey;
   try {
-    const res = await fetch(`https://api.jsonbin.io/v3/b/${settings.binId}/latest`, {
-      headers: authHeaders
-    });
-    if (!res.ok) {
-      const err = await res.json();
-      throw new Error(err.message || `HTTP ${res.status}`);
-    }
+    const res = await fetch(`https://api.jsonbin.io/v3/b/${settings.binId}/latest`, { headers: h });
+    if (!res.ok) { const err = await res.json(); throw new Error(err.message || `HTTP ${res.status}`); }
     const data = await res.json();
     if (data.record) {
       if (data.record.topics && data.record.topics.length > 0) {
-        const cloudTopics = data.record.topics;
-        const cloudIds = new Set(cloudTopics.map(t => t.id));
-        const localOnly = topics.filter(t => !cloudIds.has(t.id));
-        topics = [...cloudTopics, ...localOnly];
+        const cloud = data.record.topics, ids = new Set(cloud.map(t => t.id));
+        topics = [...cloud, ...topics.filter(t => !ids.has(t.id))];
         localStorage.setItem('sr_topics', JSON.stringify(topics));
       }
       if (data.record.subjects && data.record.subjects.length > 0) {
-        const cloudSubjects = data.record.subjects;
-        const cloudNames = new Set(cloudSubjects.map(s => s.name));
-        const localOnlySubj = subjects.filter(s => !cloudNames.has(s.name));
-        subjects = [...cloudSubjects, ...localOnlySubj];
+        const cs = data.record.subjects, cn = new Set(cs.map(s => s.name));
+        subjects = [...cs, ...subjects.filter(s => !cn.has(s.name))];
         localStorage.setItem('sr_subjects', JSON.stringify(subjects));
         renderSubjectSelect();
       }
-      renderTabs();
-      render();
+      renderTabs(); render();
     }
     updateSyncStatus();
-  } catch(e) {
-    console.error('Pull failed:', e);
-    updateSyncStatus();
-  }
+  } catch(e) { console.error('Pull failed:', e); updateSyncStatus(); }
 }
 
 function updateSyncStatus() {
-  const dot = document.getElementById('syncDot');
-  const label = document.getElementById('syncLabel');
-  if (settings.masterKey && settings.binId) {
-    dot.className = 'sync-dot online';
-    label.textContent = 'Cloud';
-  } else if (settings.masterKey) {
-    dot.className = 'sync-dot online';
-    label.textContent = 'Cloud (new)';
-  } else {
-    dot.className = 'sync-dot';
-    label.textContent = 'Local';
-  }
+  const dot = document.getElementById('syncDot'), label = document.getElementById('syncLabel');
+  if (settings.masterKey && settings.binId) { dot.className = 'sync-dot online'; label.textContent = 'Cloud'; }
+  else if (settings.masterKey) { dot.className = 'sync-dot online'; label.textContent = 'Cloud (new)'; }
+  else { dot.className = 'sync-dot'; label.textContent = 'Local'; }
+}
+
+// ── Streak ──
+function updateStreak() {
+  const allDates = new Set();
+  topics.forEach(t => { if (t.history) t.history.forEach(h => allDates.add(h.date)); });
+  let streak = 0, d = today();
+  // Check if today has reviews; if not start from yesterday
+  if (!allDates.has(d)) d = addDays(d, -1);
+  while (allDates.has(d)) { streak++; d = addDays(d, -1); }
+  const badge = document.getElementById('streakBadge');
+  badge.innerHTML = streak > 0 ? `&#128293; ${streak}d` : '';
 }
 
 // ── Date helpers ──
-function today() {
-  const d = new Date();
-  return new Date(d.getFullYear(), d.getMonth(), d.getDate()).toISOString().split('T')[0];
-}
-
-function addDays(dateStr, days) {
-  const d = new Date(dateStr + 'T00:00:00');
-  d.setDate(d.getDate() + days);
-  return d.toISOString().split('T')[0];
-}
-
-function daysDiff(dateStr) {
-  const now = new Date(today() + 'T00:00:00');
-  const target = new Date(dateStr + 'T00:00:00');
-  return Math.round((target - now) / (1000 * 60 * 60 * 24));
-}
-
+function today() { const d = new Date(); return new Date(d.getFullYear(), d.getMonth(), d.getDate()).toISOString().split('T')[0]; }
+function addDays(dateStr, days) { const d = new Date(dateStr + 'T00:00:00'); d.setDate(d.getDate() + days); return d.toISOString().split('T')[0]; }
+function daysDiff(dateStr) { return Math.round((new Date(dateStr + 'T00:00:00') - new Date(today() + 'T00:00:00')) / 86400000); }
 function formatDate(dateStr) {
   const diff = daysDiff(dateStr);
   if (diff < -1) return `${Math.abs(diff)}d overdue`;
@@ -1043,73 +666,46 @@ function formatDate(dateStr) {
   if (diff === 0) return 'Today';
   if (diff === 1) return 'Tomorrow';
   if (diff <= 7) return `In ${diff}d`;
-  const d = new Date(dateStr + 'T00:00:00');
-  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  return new Date(dateStr + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 }
 
 // ── Topic operations ──
 function addTopic() {
-  const input = document.getElementById('topicInput');
-  const name = input.value.trim();
+  const input = document.getElementById('topicInput'), name = input.value.trim();
   if (!name) { input.focus(); return; }
   const subject = document.getElementById('subjectSelect').value;
-
-  topics.push({
-    id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
-    name,
-    subject,
-    level: 1,
-    nextReview: addDays(today(), 1),
-    history: [],
-    createdAt: today()
-  });
-
-  input.value = '';
-  input.focus();
-  saveTopics();
-  renderTabs();
-  render();
-  toast(`Added "${name}" to ${subject}`);
+  pushUndo('add topic');
+  topics.push({ id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), name, subject, level: 1, nextReview: addDays(today(), 1), history: [], createdAt: today() });
+  input.value = ''; input.focus();
+  saveTopics(); renderTabs(); render(); updateStreak();
+  toastWithUndo(`Added "${name}"`);
 }
-
 function markSuccess(id) {
-  const t = topics.find(x => x.id === id);
-  if (!t) return;
+  const t = topics.find(x => x.id === id); if (!t) return;
+  pushUndo('pass');
   t.history.push({ date: today(), result: 'pass', fromLevel: t.level });
-  if (t.level < 7) {
-    t.nextReview = addDays(today(), INTERVALS[t.level]);
-    t.level++;
-  }
-  if (t.level === 7) {
-    t.nextReview = null;
-  }
-  saveTopics();
-  renderTabs();
-  render();
+  if (t.level < 7) { t.nextReview = addDays(today(), INTERVALS[t.level]); t.level++; }
+  if (t.level === 7) t.nextReview = null;
+  saveTopics(); renderTabs(); render(); updateStreak();
+  toastWithUndo(`Passed "${t.name}"`);
 }
-
 function markFail(id) {
-  const t = topics.find(x => x.id === id);
-  if (!t) return;
+  const t = topics.find(x => x.id === id); if (!t) return;
+  pushUndo('fail');
   t.history.push({ date: today(), result: 'fail', fromLevel: t.level });
-  t.level = 1;
-  t.nextReview = addDays(today(), INTERVALS[1]);
-  saveTopics();
-  renderTabs();
-  render();
+  t.level = 1; t.nextReview = addDays(today(), INTERVALS[1]);
+  saveTopics(); renderTabs(); render(); updateStreak();
+  toastWithUndo(`Failed "${t.name}"`);
 }
-
 function deleteTopic(id) {
-  const t = topics.find(x => x.id === id);
-  if (!t) return;
+  const t = topics.find(x => x.id === id); if (!t) return;
   if (!confirm(`Delete "${t.name}"?`)) return;
+  pushUndo('delete topic');
   topics = topics.filter(x => x.id !== id);
-  saveTopics();
-  renderTabs();
-  render();
+  saveTopics(); renderTabs(); render();
+  toastWithUndo(`Deleted "${t.name}"`);
 }
 
-// ── Categorize topics ──
 function categorize(topic) {
   if (topic.level === 7) return 'mastered';
   const diff = daysDiff(topic.nextReview);
@@ -1132,92 +728,74 @@ function setView(view) {
 // ── Calendar ──
 function renderCalendar() {
   const container = document.getElementById('calendarView');
-  const year = calendarYear;
-  const month = calendarMonth;
+  const year = calendarYear, month = calendarMonth;
   const firstDay = new Date(year, month, 1);
-  const lastDay = new Date(year, month + 1, 0);
-  const startDow = firstDay.getDay(); // 0=Sun
-  const daysInMonth = lastDay.getDate();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const startDow = firstDay.getDay();
   const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 
-  // Build map of date -> topics
   const filtered = activeFilter === 'All' ? topics : topics.filter(t => t.subject === activeFilter);
   const dateMap = {};
+  // Include overdue topics on today
+  const todayStr = today();
   filtered.forEach(t => {
-    if (t.level === 7) return; // skip mastered
-    const d = t.nextReview;
-    if (!d) return;
+    if (t.level === 7 || !t.nextReview) return;
+    const d = daysDiff(t.nextReview) < 0 ? todayStr : t.nextReview;
     if (!dateMap[d]) dateMap[d] = [];
     dateMap[d].push(t);
   });
 
-  const todayStr = today();
+  let html = `<div class="calendar-container"><div class="calendar-nav">
+    <button onclick="calendarPrev()">&larr;</button>
+    <span class="month-label">${monthNames[month]} ${year}</span>
+    <button onclick="calendarNext()">&rarr;</button>
+  </div><div class="calendar-grid">`;
 
-  let html = `<div class="calendar-container">
-    <div class="calendar-nav">
-      <button onclick="calendarPrev()">&larr;</button>
-      <span class="month-label">${monthNames[month]} ${year}</span>
-      <button onclick="calendarNext()">&rarr;</button>
-    </div>
-    <div class="calendar-grid">`;
+  ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].forEach(d => { html += `<div class="calendar-day-header">${d}</div>`; });
 
-  // Day headers
-  const dayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-  dayNames.forEach(d => {
-    html += `<div class="calendar-day-header">${d}</div>`;
-  });
+  const prevDays = new Date(year, month, 0).getDate();
+  for (let i = startDow - 1; i >= 0; i--) html += `<div class="calendar-day other-month"><span class="day-num">${prevDays - i}</span></div>`;
 
-  // Previous month padding
-  const prevMonth = new Date(year, month, 0);
-  const prevDays = prevMonth.getDate();
-  for (let i = startDow - 1; i >= 0; i--) {
-    const dayNum = prevDays - i;
-    html += `<div class="calendar-day other-month"><span class="day-num">${dayNum}</span></div>`;
-  }
-
-  // Current month days
   for (let d = 1; d <= daysInMonth; d++) {
     const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
     const isToday = dateStr === todayStr;
+    const isSelected = dateStr === selectedCalendarDay;
     const dayTopics = dateMap[dateStr] || [];
-
     let dotsHtml = '';
     if (dayTopics.length > 0 && dayTopics.length <= 4) {
-      dotsHtml = '<div class="day-dots">' + dayTopics.map(t =>
-        `<span class="day-dot" style="background:${getSubjectColor(t.subject)};"></span>`
-      ).join('') + '</div>';
+      dotsHtml = '<div class="day-dots">' + dayTopics.map(t => `<span class="day-dot" style="background:${getSubjectColor(t.subject)};"></span>`).join('') + '</div>';
     } else if (dayTopics.length > 4) {
       dotsHtml = `<span class="day-count">${dayTopics.length}</span>`;
     }
-
-    html += `<div class="calendar-day${isToday ? ' today-cell' : ''}" title="${dayTopics.map(t=>t.name).join(', ')}">
-      <span class="day-num">${d}</span>
-      ${dotsHtml}
-    </div>`;
+    const cls = `calendar-day${isToday ? ' today-cell' : ''}${isSelected ? ' selected-day' : ''}`;
+    html += `<div class="${cls}" onclick="selectCalendarDay('${dateStr}')" title="${dayTopics.map(t=>t.name).join(', ')}"><span class="day-num">${d}</span>${dotsHtml}</div>`;
   }
 
-  // Next month padding
-  const totalCells = startDow + daysInMonth;
-  const remaining = (7 - (totalCells % 7)) % 7;
-  for (let i = 1; i <= remaining; i++) {
-    html += `<div class="calendar-day other-month"><span class="day-num">${i}</span></div>`;
+  const remaining = (7 - ((startDow + daysInMonth) % 7)) % 7;
+  for (let i = 1; i <= remaining; i++) html += `<div class="calendar-day other-month"><span class="day-num">${i}</span></div>`;
+
+  html += '</div>';
+
+  // Day detail panel
+  if (selectedCalendarDay && dateMap[selectedCalendarDay] && dateMap[selectedCalendarDay].length > 0) {
+    const dayTopics = dateMap[selectedCalendarDay];
+    html += `<div class="calendar-day-detail"><div class="detail-title">${formatDate(selectedCalendarDay)} - ${dayTopics.length} topic(s)</div>`;
+    dayTopics.forEach(t => {
+      html += `<div class="detail-item"><span class="topic-subject" style="background:${getSubjectColor(t.subject)};">${escapeHtml(t.subject)}</span> ${escapeHtml(t.name)} <span style="color:var(--text-dim);font-size:0.7rem;">Lv${t.level}/7</span></div>`;
+    });
+    html += '</div>';
   }
 
-  html += '</div></div>';
+  html += '</div>';
   container.innerHTML = html;
 }
 
-function calendarPrev() {
-  calendarMonth--;
-  if (calendarMonth < 0) { calendarMonth = 11; calendarYear--; }
+function selectCalendarDay(dateStr) {
+  selectedCalendarDay = selectedCalendarDay === dateStr ? null : dateStr;
   renderCalendar();
 }
-
-function calendarNext() {
-  calendarMonth++;
-  if (calendarMonth > 11) { calendarMonth = 0; calendarYear++; }
-  renderCalendar();
-}
+function calendarPrev() { calendarMonth--; if (calendarMonth < 0) { calendarMonth = 11; calendarYear--; } selectedCalendarDay = null; renderCalendar(); }
+function calendarNext() { calendarMonth++; if (calendarMonth > 11) { calendarMonth = 0; calendarYear++; } selectedCalendarDay = null; renderCalendar(); }
 
 // ── Render ──
 function renderTabs() {
@@ -1225,138 +803,95 @@ function renderTabs() {
   const names = getSubjectNames();
   const counts = { All: topics.length };
   names.forEach(s => { counts[s] = topics.filter(t => t.subject === s).length; });
-
   container.innerHTML = ['All', ...names].map(s => {
-    const isAll = s === 'All';
-    const color = isAll ? 'var(--accent)' : getSubjectColor(s);
-    const isActive = activeFilter === s;
-    const bgStyle = isActive
-      ? `background:${color};border-color:${color};`
-      : `border-color:var(--border);`;
+    const isAll = s === 'All', color = isAll ? 'var(--accent)' : getSubjectColor(s), isActive = activeFilter === s;
+    const bgStyle = isActive ? `background:${color};border-color:${color};` : '';
     return `<button class="tab${isActive ? ' active' : ''}" style="${bgStyle}" onclick="setFilter('${escapeHtml(s).replace(/'/g, "\\'")}')">
-      ${!isAll ? `<span class="color-dot" style="background:${isActive ? '#fff' : color};"></span>` : ''}
-      ${escapeHtml(s)}<span class="count">${counts[s]}</span>
-    </button>`;
+      ${!isAll ? `<span class="color-dot" style="background:${isActive ? '#fff' : color};"></span>` : ''}${escapeHtml(s)}<span class="count">${counts[s]}</span></button>`;
   }).join('');
 }
 
 function setFilter(f) {
   activeFilter = f;
-  // Auto-select subject in the add-topic dropdown
-  if (f !== 'All' && subjects.find(s => s.name === f)) {
-    document.getElementById('subjectSelect').value = f;
-  }
-  renderTabs();
-  render();
+  if (f !== 'All' && subjects.find(s => s.name === f)) document.getElementById('subjectSelect').value = f;
+  renderTabs(); render();
+}
+
+function renderSubjectStats() {
+  const container = document.getElementById('subjectStats');
+  container.innerHTML = subjects.map(s => {
+    const count = topics.filter(t => t.subject === s.name).length;
+    const overdue = topics.filter(t => t.subject === s.name && categorize(t) === 'overdue').length;
+    const mastered = topics.filter(t => t.subject === s.name && t.level === 7).length;
+    return `<div class="subject-stat"><span class="ss-dot" style="background:${s.color};"></span>${escapeHtml(s.name)}: <span class="ss-count">${count}</span>${overdue > 0 ? `<span style="color:var(--overdue);">(${overdue}!)</span>` : ''}${mastered > 0 ? `<span style="color:var(--mastered);">(${mastered}&#10003;)</span>` : ''}</div>`;
+  }).join('');
 }
 
 function render() {
-  const filtered = activeFilter === 'All' ? topics : topics.filter(t => t.subject === activeFilter);
+  let filtered = activeFilter === 'All' ? [...topics] : topics.filter(t => t.subject === activeFilter);
+  if (searchQuery) {
+    const q = searchQuery.toLowerCase();
+    filtered = filtered.filter(t => t.name.toLowerCase().includes(q) || t.subject.toLowerCase().includes(q));
+  }
   const groups = { overdue: [], today: [], soon: [], later: [], mastered: [] };
-  filtered.forEach(t => {
-    const cat = categorize(t);
-    groups[cat].push(t);
-  });
-
+  filtered.forEach(t => { groups[categorize(t)].push(t); });
   groups.overdue.sort((a, b) => daysDiff(a.nextReview) - daysDiff(b.nextReview));
   groups.today.sort((a, b) => a.name.localeCompare(b.name));
   groups.soon.sort((a, b) => daysDiff(a.nextReview) - daysDiff(b.nextReview));
   groups.later.sort((a, b) => daysDiff(a.nextReview) - daysDiff(b.nextReview));
   groups.mastered.sort((a, b) => a.name.localeCompare(b.name));
 
-  // Update stats (always show all topics, not filtered)
   const allGroups = { overdue: 0, today: 0, soon: 0, mastered: 0 };
-  topics.forEach(t => {
-    const cat = categorize(t);
-    if (cat === 'overdue') allGroups.overdue++;
-    else if (cat === 'today') allGroups.today++;
-    else if (cat === 'soon') allGroups.soon++;
-    else if (cat === 'mastered') allGroups.mastered++;
-  });
+  topics.forEach(t => { const c = categorize(t); if (allGroups[c] !== undefined) allGroups[c]++; });
   document.getElementById('statOverdue').textContent = allGroups.overdue;
   document.getElementById('statToday').textContent = allGroups.today;
   document.getElementById('statSoon').textContent = allGroups.soon;
   document.getElementById('statMastered').textContent = allGroups.mastered;
 
+  renderSubjectStats();
+
   const container = document.getElementById('topicList');
   if (filtered.length === 0) {
-    container.innerHTML = `<div class="empty-state">
-      <div class="icon">&#128218;</div>
-      <p>No topics yet. Add one above to start tracking!</p>
-    </div>`;
+    container.innerHTML = `<div class="empty-state"><div class="icon">&#128218;</div><p>${searchQuery ? 'No matching topics' : 'No topics yet. Add one above!'}</p></div>`;
     if (currentView === 'calendar') renderCalendar();
     return;
   }
-
   let html = '';
-  const sections = [
-    { key: 'overdue', label: 'Overdue', cls: 'overdue' },
-    { key: 'today', label: 'Due Today', cls: 'today' },
-    { key: 'soon', label: 'Coming Soon', cls: 'soon' },
-    { key: 'later', label: 'Later', cls: 'later' },
-    { key: 'mastered', label: 'Mastered', cls: 'mastered' }
-  ];
-
-  sections.forEach(sec => {
+  [{ key: 'overdue', label: 'Overdue', cls: 'overdue' }, { key: 'today', label: 'Due Today', cls: 'today' }, { key: 'soon', label: 'Coming Soon', cls: 'soon' }, { key: 'later', label: 'Later', cls: 'later' }, { key: 'mastered', label: 'Mastered', cls: 'mastered' }].forEach(sec => {
     if (groups[sec.key].length === 0) return;
     html += `<div class="section-header ${sec.cls}"><span class="dot"></span>${sec.label} (${groups[sec.key].length})</div>`;
-    groups[sec.key].forEach(t => {
-      html += renderCard(t, sec.key);
-    });
+    groups[sec.key].forEach(t => { html += renderCard(t, sec.key); });
   });
-
   container.innerHTML = html;
-
   if (currentView === 'calendar') renderCalendar();
 }
 
 function renderCard(t, category) {
   const subjColor = getSubjectColor(t.subject);
-  const cardClass = category === 'overdue' ? 'overdue'
-    : category === 'today' ? 'due-today'
-    : category === 'soon' ? 'due-soon'
-    : category === 'mastered' ? 'mastered-card' : '';
-
-  const pips = Array.from({ length: 7 }, (_, i) => {
-    const filled = i < t.level;
-    const cls = t.level === 7 ? 'pip mastered-pip' : (filled ? 'pip filled' : 'pip');
-    return `<span class="${cls}"></span>`;
-  }).join('');
-
+  const cardClass = { overdue: 'overdue', today: 'due-today', soon: 'due-soon', mastered: 'mastered-card' }[category] || '';
+  const pips = Array.from({ length: 7 }, (_, i) => `<span class="${t.level === 7 ? 'pip mastered-pip' : (i < t.level ? 'pip filled' : 'pip')}"></span>`).join('');
   const dateStr = t.level === 7 ? 'Mastered' : formatDate(t.nextReview);
-  const isMastered = t.level === 7;
   const sessions = t.history ? t.history.length : 0;
-
   return `<div class="topic-card ${cardClass}">
     <div class="topic-info">
       <div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;">
         <span class="topic-subject" style="background:${subjColor};">${escapeHtml(t.subject)}</span>
         <span class="topic-name">${escapeHtml(t.name)}</span>
       </div>
-      <div class="topic-meta">
-        <span>Lv ${t.level}/7</span>
-        <span>${dateStr}</span>
-        <span>${sessions} session${sessions !== 1 ? 's' : ''}</span>
-      </div>
+      <div class="topic-meta"><span>Lv ${t.level}/7</span><span>${dateStr}</span><span>${sessions} session${sessions !== 1 ? 's' : ''}</span></div>
       <div class="level-pips" style="margin-top:0.3rem;">${pips}</div>
     </div>
     <div class="topic-actions">
-      ${!isMastered ? `
-        <button class="btn-pass" onclick="markSuccess('${t.id}')" title="Passed review">Pass</button>
-        <button class="btn-fail" onclick="markFail('${t.id}')" title="Failed review">Fail</button>
-      ` : ''}
+      ${t.level !== 7 ? `<button class="btn-pass" onclick="markSuccess('${t.id}')">Pass</button><button class="btn-fail" onclick="markFail('${t.id}')">Fail</button>` : ''}
+      <button class="btn-edit" onclick="openEditTopic('${t.id}')" title="Edit">&#9998;</button>
       <button class="btn-del" onclick="deleteTopic('${t.id}')" title="Delete">&times;</button>
     </div>
   </div>`;
 }
 
-function escapeHtml(str) {
-  const div = document.createElement('div');
-  div.textContent = str;
-  return div.innerHTML;
-}
+function escapeHtml(str) { const d = document.createElement('div'); d.textContent = str; return d.innerHTML; }
 
-// ── Settings modal ──
+// ── Settings ──
 function openSettings() {
   document.getElementById('masterKeyInput').value = settings.masterKey;
   document.getElementById('accessKeyInput').value = settings.accessKey;
@@ -1364,97 +899,61 @@ function openSettings() {
   document.getElementById('autoSyncCheckbox').checked = settings.autoSync;
   document.getElementById('settingsModal').classList.add('open');
 }
-
-function closeSettings() {
-  document.getElementById('settingsModal').classList.remove('open');
-}
-
+function closeSettings() { document.getElementById('settingsModal').classList.remove('open'); }
 function saveSettings() {
   settings.masterKey = document.getElementById('masterKeyInput').value.trim();
   settings.accessKey = document.getElementById('accessKeyInput').value.trim();
   settings.binId = document.getElementById('binIdInput').value.trim();
   settings.autoSync = document.getElementById('autoSyncCheckbox').checked;
-  saveSettingsToStorage();
-  updateSyncStatus();
-  closeSettings();
-  toast('Settings saved');
-  if (settings.masterKey) {
-    if (settings.binId) {
-      pullFromCloud();
-    } else {
-      pushToCloud();
-    }
-  }
+  saveSettingsToStorage(); updateSyncStatus(); closeSettings(); toast('Settings saved');
+  if (settings.masterKey) { settings.binId ? pullFromCloud() : pushToCloud(); }
 }
 
 // ── Export / Import ──
 function exportData() {
   const blob = new Blob([JSON.stringify({ topics, subjects, settings: { binId: settings.binId }, exportedAt: new Date().toISOString() }, null, 2)], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `sr-tracker-backup-${today()}.json`;
-  a.click();
-  URL.revokeObjectURL(url);
-  toast('Data exported');
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `sr-tracker-${today()}.json`; a.click();
+  toast('Exported');
 }
-
 function importData(event) {
-  const file = event.target.files[0];
-  if (!file) return;
+  const file = event.target.files[0]; if (!file) return;
   const reader = new FileReader();
   reader.onload = function(e) {
     try {
       const data = JSON.parse(e.target.result);
       if (data.topics && Array.isArray(data.topics)) {
+        pushUndo('import');
         topics = data.topics;
-        if (data.subjects && Array.isArray(data.subjects)) {
-          subjects = data.subjects;
-          saveSubjects();
-          renderSubjectSelect();
-        }
-        saveTopics();
-        renderTabs();
-        render();
-        toast(`Imported ${topics.length} topics`);
-      } else {
-        toast('Invalid file format');
-      }
-    } catch(err) {
-      toast('Failed to parse file');
-    }
+        if (data.subjects && Array.isArray(data.subjects)) { subjects = data.subjects; saveSubjects(); renderSubjectSelect(); }
+        saveTopics(); renderTabs(); render(); toast(`Imported ${topics.length} topics`);
+      } else { toast('Invalid file'); }
+    } catch(err) { toast('Parse error'); }
   };
-  reader.readAsText(file);
-  event.target.value = '';
+  reader.readAsText(file); event.target.value = '';
 }
 
 // ── Toast ──
 function toast(msg) {
-  const container = document.getElementById('toastContainer');
-  const el = document.createElement('div');
-  el.className = 'toast';
-  el.textContent = msg;
-  container.appendChild(el);
-  setTimeout(() => { el.remove(); }, 2500);
+  const el = document.createElement('div'); el.className = 'toast'; el.textContent = msg;
+  document.getElementById('toastContainer').appendChild(el);
+  setTimeout(() => el.remove(), 2500);
+}
+function toastWithUndo(msg) {
+  const el = document.createElement('div'); el.className = 'toast';
+  el.innerHTML = `<span>${escapeHtml(msg)}</span><button class="undo-btn" onclick="performUndo();this.parentElement.remove();">Undo</button>`;
+  document.getElementById('toastContainer').appendChild(el);
+  setTimeout(() => el.remove(), 5000);
 }
 
-// ── Keyboard shortcut ──
-document.getElementById('topicInput').addEventListener('keydown', function(e) {
-  if (e.key === 'Enter') addTopic();
-});
+// ── Events ──
+document.getElementById('topicInput').addEventListener('keydown', e => { if (e.key === 'Enter') addTopic(); });
+document.getElementById('searchInput').addEventListener('input', e => { searchQuery = e.target.value; render(); });
+document.getElementById('settingsModal').addEventListener('click', function(e) { if (e.target === this) closeSettings(); });
+document.getElementById('addSubjectModal').addEventListener('click', function(e) { if (e.target === this) closeAddSubject(); });
+document.getElementById('editTopicModal').addEventListener('click', function(e) { if (e.target === this) closeEditTopic(); });
+document.getElementById('subjectNameInput').addEventListener('keydown', e => { if (e.key === 'Enter') confirmAddSubject(); });
+document.getElementById('editTopicName').addEventListener('keydown', e => { if (e.key === 'Enter') saveEditTopic(); });
 
-// Close modals on overlay click
-document.getElementById('settingsModal').addEventListener('click', function(e) {
-  if (e.target === this) closeSettings();
-});
-document.getElementById('addSubjectModal').addEventListener('click', function(e) {
-  if (e.target === this) closeAddSubject();
-});
-document.getElementById('subjectNameInput').addEventListener('keydown', function(e) {
-  if (e.key === 'Enter') confirmAddSubject();
-});
-
-// ── Start ──
 init();
 </script>
 </body>
