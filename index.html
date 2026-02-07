@@ -171,6 +171,8 @@ body {
 .tab .color-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
 .tab .count { display: inline-block; background: rgba(255,255,255,0.15); padding: 0 0.4rem; border-radius: 8px; font-size: 0.7rem; }
 .tab.active .count { background: rgba(255,255,255,0.25); }
+.tab-del { display: inline-flex; align-items: center; justify-content: center; width: 16px; height: 16px; border-radius: 50%; font-size: 0.75rem; line-height: 1; margin-left: 2px; opacity: 0.5; transition: all 0.15s; }
+.tab-del:hover { opacity: 1; background: rgba(239,68,68,0.8); color: #fff; }
 
 /* Search */
 .search-row { margin-bottom: 1rem; }
@@ -808,7 +810,6 @@ function saveSubjectEdit(i) {
 async function deleteSubject(i) {
   const subj = subjects[i];
   const n = topics.filter(t => t.subject === subj.name).length;
-  // Close subject modal first so confirm dialog is fully visible
   document.getElementById('addSubjectModal').classList.remove('open');
   const detail = n > 0
     ? `This subject has ${n} topic${n > 1 ? 's' : ''}. They will keep their current subject label but the subject will be removed from the list.`
@@ -817,8 +818,14 @@ async function deleteSubject(i) {
   if (!ok) { document.getElementById('addSubjectModal').classList.add('open'); renderSubjectList(); return; }
   pushUndo('delete subject');
   subjects.splice(i, 1);
+  if (activeFilter === subj.name) activeFilter = 'All';
   saveSubjects(); renderSubjectSelect(); renderTabs(); render();
   toastWithUndo(`Subject "${subj.name}" deleted`);
+}
+async function deleteSubjectByName(name) {
+  const i = subjects.findIndex(s => s.name === name);
+  if (i === -1) return;
+  await deleteSubject(i);
 }
 
 function renderColorGrid() {
@@ -1184,8 +1191,9 @@ function renderTabs() {
   container.innerHTML = ['All', ...names].map(s => {
     const isAll = s === 'All', color = isAll ? 'var(--accent)' : getSubjectColor(s), isActive = activeFilter === s;
     const bgStyle = isActive ? `background:${color};border-color:${color};` : '';
+    const delBtn = !isAll ? `<span class="tab-del" onclick="event.stopPropagation();deleteSubjectByName('${escapeHtml(s).replace(/'/g, "\\'")}')">&times;</span>` : '';
     return `<button class="tab${isActive ? ' active' : ''}" style="${bgStyle}" onclick="setFilter('${escapeHtml(s).replace(/'/g, "\\'")}')">
-      ${!isAll ? `<span class="color-dot" style="background:${isActive ? '#fff' : color};"></span>` : ''}${escapeHtml(s)}<span class="count">${counts[s]}</span></button>`;
+      ${!isAll ? `<span class="color-dot" style="background:${isActive ? '#fff' : color};"></span>` : ''}${escapeHtml(s)}<span class="count">${counts[s]}</span>${delBtn}</button>`;
   }).join('');
 }
 
