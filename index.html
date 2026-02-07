@@ -810,14 +810,16 @@ function saveSubjectEdit(i) {
 async function deleteSubject(i) {
   const subj = subjects[i];
   const n = topics.filter(t => t.subject === subj.name).length;
+  // Close subject modal first so confirm dialog is fully visible
+  document.getElementById('addSubjectModal').classList.remove('open');
   const detail = n > 0
     ? `This subject has ${n} topic${n > 1 ? 's' : ''}. They will keep their current subject label but the subject will be removed from the list.`
     : 'This subject has no topics.';
   const ok = await customConfirm(`Delete "${subj.name}"?`, detail);
-  if (!ok) return;
+  if (!ok) { document.getElementById('addSubjectModal').classList.add('open'); renderSubjectList(); return; }
   pushUndo('delete subject');
   subjects.splice(i, 1);
-  saveSubjects(); renderSubjectSelect(); renderSubjectList(); renderTabs(); render();
+  saveSubjects(); renderSubjectSelect(); renderTabs(); render();
   toastWithUndo(`Subject "${subj.name}" deleted`);
 }
 
