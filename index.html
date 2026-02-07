@@ -949,9 +949,9 @@ function updateStreak() {
 }
 
 // ── Date helpers ──
-function today() { const d = new Date(); return new Date(d.getFullYear(), d.getMonth(), d.getDate()).toISOString().split('T')[0]; }
-function addDays(dateStr, days) { const d = new Date(dateStr + 'T00:00:00'); d.setDate(d.getDate() + days); return d.toISOString().split('T')[0]; }
-function daysDiff(dateStr) { return Math.round((new Date(dateStr + 'T00:00:00') - new Date(today() + 'T00:00:00')) / 86400000); }
+function today() { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
+function addDays(dateStr, days) { const [y,m,d] = dateStr.split('-').map(Number); const dt = new Date(y, m-1, d+days); return `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`; }
+function daysDiff(dateStr) { const [y,m,d] = dateStr.split('-').map(Number); const target = new Date(y, m-1, d); const now = new Date(); const todayDate = new Date(now.getFullYear(), now.getMonth(), now.getDate()); return Math.round((target - todayDate) / 86400000); }
 function formatDate(dateStr) {
   const diff = daysDiff(dateStr);
   if (diff < -1) return `${Math.abs(diff)}d overdue`;
